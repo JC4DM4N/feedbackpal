@@ -1,20 +1,28 @@
+import { useState } from 'react'
 import './App.css'
+import Dashboard from './Dashboard'
 
 function App() {
+  const [view, setView] = useState('landing')
+
+  if (view === 'dashboard') {
+    return <Dashboard onLogout={() => setView('landing')} />
+  }
+
   return (
     <div className="landing">
-      <Nav />
-      <Hero />
+      <Nav onLogin={() => setView('dashboard')} />
+      <Hero onGetStarted={() => setView('dashboard')} />
       <HowItWorks />
       <Features />
       <Testimonials />
-      <CTA />
+      <CTA onGetStarted={() => setView('dashboard')} />
       <Footer />
     </div>
   )
 }
 
-function Nav() {
+function Nav({ onLogin }) {
   return (
     <nav className="nav">
       <div className="nav-inner">
@@ -27,15 +35,15 @@ function Nav() {
           <a href="#features">Features</a>
         </div>
         <div className="nav-actions">
-          <a href="#" className="btn btn-ghost">Log in</a>
-          <a href="#" className="btn btn-primary">Get started</a>
+          <button onClick={onLogin} className="btn btn-ghost">Log in</button>
+          <button onClick={onLogin} className="btn btn-primary">Get started</button>
         </div>
       </div>
     </nav>
   )
 }
 
-function Hero() {
+function Hero({ onGetStarted }) {
   return (
     <section className="hero">
       <div className="hero-badge">
@@ -51,7 +59,7 @@ function Hero() {
         A community where indie developers help each other ship better products.
       </p>
       <div className="hero-actions">
-        <a href="#" className="btn btn-primary btn-lg">Submit your app</a>
+        <button onClick={onGetStarted} className="btn btn-primary btn-lg">Submit your app</button>
         <a href="#how-it-works" className="btn btn-outline btn-lg">See how it works</a>
       </div>
       <div className="hero-social-proof">
@@ -258,7 +266,7 @@ function Testimonials() {
   )
 }
 
-function CTA() {
+function CTA({ onGetStarted }) {
   const stages = [
     { icon: '💡', label: 'Just an idea', desc: "Validate your concept before writing a single line of code." },
     { icon: '🔧', label: 'Early prototype', desc: "Get a gut-check on your UX before you build the wrong thing." },
@@ -281,7 +289,7 @@ function CTA() {
             </div>
           ))}
         </div>
-        <a href="#" className="btn btn-primary btn-lg">Submit your app — it's free</a>
+        <button onClick={onGetStarted} className="btn btn-primary btn-lg">Submit your app — it's free</button>
         <p className="cta-note">No credit card. No paid plans. No catch.</p>
       </div>
     </section>
