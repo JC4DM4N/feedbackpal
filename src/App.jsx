@@ -47,7 +47,7 @@ function Hero() {
         <span className="gradient-text">real indie developers</span>
       </h1>
       <p className="hero-sub">
-        Post your app. Give feedback on others. Get honest, actionable feedback back.<br />
+        Post your app. Give feedback on others. Get honest, actionable feedback in return.<br />
         A community where indie developers help each other ship better products.
       </p>
       <div className="hero-actions">
@@ -183,6 +183,11 @@ function Features() {
       desc: 'Specify what you want feedback on — UX, onboarding, pricing, features. Get answers to your actual questions.',
     },
     {
+      icon: '✅',
+      title: 'Quality ensured feedback',
+      desc: 'Credits are only awarded once you approve the feedback you receive. No incentive to spam — reviewers earn only when their feedback is genuinely useful.',
+    },
+    {
       icon: '🌍',
       title: 'Built for indie developers',
       desc: 'No enterprise noise. Just solo founders, indie hackers, and small teams building real products.',
@@ -191,11 +196,6 @@ function Features() {
       icon: '⚡',
       title: 'Fast turnaround',
       desc: 'Active reviewers mean you can get your first feedback within hours of submitting, not days.',
-    },
-    {
-      icon: '✅',
-      title: 'Quality ensured feedback',
-      desc: 'Credits are only awarded once you approve the feedback you receive. No incentive to spam — reviewers earn only when their feedback is genuinely useful.',
     },
   ]
 
@@ -259,31 +259,30 @@ function Testimonials() {
 }
 
 function CTA() {
-  const steps = [
-    { icon: 'Step 1', label: 'Create a free account', sub: 'FeedbackPal is completely free to use!' },
-    { icon: 'Step 2', label: 'Submit your app', sub: 'Add your app\`s URL and a desciption of what you want tested.' },
-    { icon: 'Step 3', label: 'Review someone else\'s app', sub: 'Earn a credit with each approved review of someone else\'s app.' },
-    { icon: 'Step 4', label: 'Get feedback on yours', sub: 'Spend your credits to get real, human feedback from another developer.' },
+  const stages = [
+    { icon: '💡', label: 'Just an idea', desc: "Validate your concept before writing a single line of code." },
+    { icon: '🔧', label: 'Early prototype', desc: "Get a gut-check on your UX before you build the wrong thing." },
+    { icon: '🚀', label: 'Beta / pre-launch', desc: "Iron out the rough edges before you go public." },
+    { icon: '📈', label: 'Already live', desc: "Keep improving with ongoing feedback from fresh eyes." },
   ]
 
   return (
     <section className="cta-section">
       <div className="cta-inner">
-        <h2>Ready to get honest feedback?</h2>
-        <p>Submit your app today and start receiving real feedback from indie developers who understand your world.</p>
-        <div className="cta-steps">
-          {steps.map((step, i) => (
-            <div key={i} className="cta-steps-item">
-              <div className="cta-step-badge">
-                <span className="cta-step-icon">{step.icon}</span>
-                <span className="cta-step-label">{step.label}</span>
-                <span className="cta-step-sub">{step.sub}</span>
-              </div>
-              {i < steps.length - 1 && <span className="cta-step-arrow">→</span>}
+        <div className="cta-badge">Completely free — no credit card needed</div>
+        <h2>Ready to stop guessing?</h2>
+        <p>Submit your app at whatever stage it's at. You don't need a finished product — you just need a willingness to give and receive honest feedback.</p>
+        <div className="cta-stages">
+          {stages.map((s, i) => (
+            <div key={i} className="cta-stage-card">
+              <span className="cta-stage-icon">{s.icon}</span>
+              <span className="cta-stage-label">{s.label}</span>
+              <span className="cta-stage-desc">{s.desc}</span>
             </div>
           ))}
         </div>
         <a href="#" className="btn btn-primary btn-lg">Submit your app — it's free</a>
+        <p className="cta-note">No credit card. No paid plans. No catch.</p>
       </div>
     </section>
   )
