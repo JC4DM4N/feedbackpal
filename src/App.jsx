@@ -1,22 +1,55 @@
 import { useState } from 'react'
 import './App.css'
 import Dashboard from './Dashboard'
+import LoginPage from './LoginPage'
+
+function getStoredUser() {
+  try {
+    const raw = localStorage.getItem('user')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
 
 function App() {
-  const [view, setView] = useState('landing')
+  const storedUser = getStoredUser()
+  const [view, setView] = useState(storedUser ? 'dashboard' : 'landing')
+  const [user, setUser] = useState(storedUser)
+
+  function handleLoginSuccess(userData) {
+    setUser(userData)
+    setView('dashboard')
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    setView('landing')
+  }
+
+  if (view === 'login') {
+    return (
+      <LoginPage
+        onSuccess={handleLoginSuccess}
+        onBack={() => setView('landing')}
+      />
+    )
+  }
 
   if (view === 'dashboard') {
-    return <Dashboard onLogout={() => setView('landing')} />
+    return <Dashboard user={user} onLogout={handleLogout} />
   }
 
   return (
     <div className="landing">
-      <Nav onLogin={() => setView('dashboard')} />
-      <Hero onGetStarted={() => setView('dashboard')} />
+      <Nav onLogin={() => setView('login')} />
+      <Hero onGetStarted={() => setView('login')} />
       <HowItWorks />
       <Features />
       <Testimonials />
-      <CTA onGetStarted={() => setView('dashboard')} />
+      <CTA onGetStarted={() => setView('login')} />
       <Footer />
     </div>
   )

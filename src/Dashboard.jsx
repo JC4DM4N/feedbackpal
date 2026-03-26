@@ -143,12 +143,12 @@ const NAV = [
 ]
 
 /* ── Root ── */
-export default function Dashboard({ onLogout }) {
+export default function Dashboard({ user, onLogout }) {
   const [page, setPage] = useState('explore')
 
   return (
     <div className="dashboard">
-      <Sidebar page={page} setPage={setPage} onLogout={onLogout} />
+      <Sidebar page={page} setPage={setPage} user={user} onLogout={onLogout} />
       <main className="dash-main">
         {page === 'explore' && <ExplorePage />}
         {page !== 'explore' && <ComingSoon label={NAV.find(n => n.id === page)?.label} />}
@@ -158,7 +158,7 @@ export default function Dashboard({ onLogout }) {
 }
 
 /* ── Sidebar ── */
-function Sidebar({ page, setPage, onLogout }) {
+function Sidebar({ page, setPage, user, onLogout }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -189,10 +189,10 @@ function Sidebar({ page, setPage, onLogout }) {
       </div>
       <div className="sidebar-footer">
         <div className="sidebar-user">
-          <div className="sidebar-avatar">J</div>
+          <div className="sidebar-avatar">{user?.username?.[0]?.toUpperCase()}</div>
           <div>
-            <div className="sidebar-name">Jamie D.</div>
-            <div className="sidebar-handle">@jamied</div>
+            <div className="sidebar-name">{user?.username}</div>
+            <div className="sidebar-handle">{user?.email}</div>
           </div>
         </div>
         <button className="sidebar-logout" onClick={onLogout}>Log out</button>
