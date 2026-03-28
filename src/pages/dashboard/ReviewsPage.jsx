@@ -58,7 +58,7 @@ export default function ReviewsPage({ onOpenReview }) {
                   </td>
                   <td>
                     <span className={`review-status-badge ${r.is_rejected ? 'rejected' : r.is_complete ? 'complete' : r.is_submitted ? 'awaiting' : 'in-progress'}`}>
-                      {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : 'In progress'}
+                      {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : r.review_requested ? 'Review Requested' : 'In progress'}
                     </span>
                   </td>
                   <td className="reviews-date">

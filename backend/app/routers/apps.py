@@ -154,7 +154,10 @@ def get_app_reviews(
             id=review.id,
             reviewer_username=user.username,
             feedback=review.feedback,
+            is_submitted=review.is_submitted,
             is_complete=review.is_complete,
+            is_rejected=review.is_rejected,
+            review_requested=review.review_requested,
             created_date=review.created_date,
         )
         for review, user in rows

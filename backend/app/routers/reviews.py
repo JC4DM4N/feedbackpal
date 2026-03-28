@@ -38,7 +38,7 @@ def create_review(
     ).first():
         raise HTTPException(status_code=400, detail="You have already reviewed this app")
 
-    review = models.Review(app_id=payload.app_id, reviewer_id=current_user.id)
+    review = models.Review(app_id=payload.app_id, reviewer_id=current_user.id, review_requested=True)
     db.add(review)
     db.commit()
     db.refresh(review)
@@ -191,6 +191,7 @@ def _to_out(review: models.Review, app: models.App) -> schemas.ReviewOut:
         is_submitted=review.is_submitted,
         is_complete=review.is_complete,
         is_rejected=review.is_rejected,
+        review_requested=review.review_requested,
         created_date=review.created_date,
         app_name=app.name,
         app_initials=app.initials,
@@ -207,6 +208,7 @@ def _to_detail(review: models.Review, app: models.App, screenshots: list) -> sch
         is_submitted=review.is_submitted,
         is_complete=review.is_complete,
         is_rejected=review.is_rejected,
+        review_requested=review.review_requested,
         owner_message=review.owner_message,
         created_date=review.created_date,
         app_name=app.name,

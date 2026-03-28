@@ -50,6 +50,7 @@ class ReviewOut(BaseModel):
     is_submitted: bool
     is_complete: bool
     is_rejected: bool
+    review_requested: bool
     created_date: datetime
     app_name: str
     app_initials: str
@@ -64,6 +65,7 @@ class ReviewDetail(BaseModel):
     is_submitted: bool
     is_complete: bool
     is_rejected: bool
+    review_requested: bool
     owner_message: str | None
     created_date: datetime
     app_name: str
@@ -90,5 +92,8 @@ class AppReviewFeedItem(BaseModel):
     id: int
     reviewer_username: str
     feedback: str | None
+    is_submitted: bool
     is_complete: bool
+    is_rejected: bool
+    review_requested: bool
     created_date: datetime

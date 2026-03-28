@@ -49,9 +49,10 @@ CREATE TABLE IF NOT EXISTS reviews (
     id            SERIAL PRIMARY KEY,
     app_id        INTEGER     NOT NULL REFERENCES apps(id)  ON DELETE CASCADE,
     reviewer_id   INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    is_submitted  BOOLEAN     NOT NULL DEFAULT FALSE,
-    is_complete   BOOLEAN     NOT NULL DEFAULT FALSE,
-    is_rejected   BOOLEAN     NOT NULL DEFAULT FALSE,
+    is_submitted       BOOLEAN     NOT NULL DEFAULT FALSE,
+    is_complete        BOOLEAN     NOT NULL DEFAULT FALSE,
+    is_rejected        BOOLEAN     NOT NULL DEFAULT FALSE,
+    review_requested   BOOLEAN     NOT NULL DEFAULT FALSE,
     feedback      TEXT,
     owner_message TEXT,
     created_date  TIMESTAMPTZ DEFAULT NOW()

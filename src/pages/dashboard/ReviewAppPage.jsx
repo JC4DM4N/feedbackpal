@@ -120,6 +120,9 @@ export default function ReviewAppPage({ reviewId, onBack }) {
               {detail.is_submitted && !detail.is_complete && !detail.is_rejected && (
                 <span className="review-status-badge awaiting">Awaiting approval</span>
               )}
+              {!detail.is_submitted && !detail.is_complete && !detail.is_rejected && detail.review_requested && (
+                <span className="review-status-badge in-progress">Review Requested</span>
+              )}
             </div>
           </div>
           <a

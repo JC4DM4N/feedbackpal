@@ -75,7 +75,9 @@ export default function OwnerReviewPage({ appId, reviewId, onBack }) {
                   <span className="review-status-badge awaiting">Awaiting approval</span>
                 )}
                 {!detail.is_submitted && !detail.is_complete && !detail.is_rejected && (
-                  <span className="review-status-badge in-progress">In progress</span>
+                  <span className="review-status-badge in-progress">
+                    {detail.review_requested ? 'Review Requested' : 'In progress'}
+                  </span>
                 )}
               </div>
             </div>

@@ -82,8 +82,8 @@ export default function MyAppDetailPage({ appId, onBack, onOpenReview }) {
                           {new Date(r.created_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                       </div>
-                      <span className={`review-status-badge ${r.is_complete ? 'complete' : 'in-progress'}`}>
-                        {r.is_complete ? 'Complete' : 'In progress'}
+                      <span className={`review-status-badge ${r.is_rejected ? 'rejected' : r.is_complete ? 'complete' : r.is_submitted ? 'awaiting' : 'in-progress'}`}>
+                        {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : r.review_requested ? 'Review Requested' : 'In progress'}
                       </span>
                     </div>
                     {r.feedback ? (
