@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ExplorePage.css'
+import { STAGE_STYLES } from '../../constants'
 
 const CATEGORIES = ['All', 'Productivity', 'SaaS Tools', 'Developer Tools', 'Design', 'Mobile', 'E-commerce']
 const STAGES = ['All', 'Pre-launch', 'Beta', 'Live']
@@ -8,12 +9,6 @@ const SORTS = [
   { value: 'newest', label: 'Newest first' },
   { value: 'most-feedback', label: 'Most feedback' },
 ]
-
-const STAGE_STYLES = {
-  'Pre-launch': { bg: '#fef3c7', color: '#92400e' },
-  'Beta':       { bg: '#dbeafe', color: '#1e40af' },
-  'Live':       { bg: '#d1fae5', color: '#065f46' },
-}
 
 function IconSearch() {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -166,7 +161,7 @@ function AppCard({ app, onReview }) {
       <div className="app-card-footer">
         <div className="app-footer-stat">
           <span className="app-footer-label">STAGE</span>
-          <span className="app-stage-badge" style={{ background: stage.bg, color: stage.color }}>{app.stage}</span>
+          <span className="app-stage-badge" style={stage}>{app.stage}</span>
         </div>
         <div className="app-footer-stat">
           <span className="app-footer-label">CREDITS</span>

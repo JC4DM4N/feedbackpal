@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import './ReviewAppPage.css'
-
-const STAGE_STYLES = {
-  'Pre-launch': { bg: '#fef3c7', color: '#92400e' },
-  'Beta':       { bg: '#dbeafe', color: '#1e40af' },
-  'Live':       { bg: '#d1fae5', color: '#065f46' },
-}
+import { STAGE_STYLES } from '../../constants'
 
 export default function ReviewAppPage({ reviewId, onBack }) {
   const [detail, setDetail] = useState(null)
@@ -43,14 +38,15 @@ export default function ReviewAppPage({ reviewId, onBack }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ feedback, is_complete: true }),
+        body: JSON.stringify({ feedback, is_submitted: true }),
       })
       if (!res.ok) {
         const data = await res.json()
         setError(data.detail || 'Failed to submit review')
         return
       }
-      onBack()
+      const data = await res.json()
+      setDetail(data)
     } catch {
       setError('Could not connect to server')
     } finally {
@@ -116,11 +112,13 @@ export default function ReviewAppPage({ reviewId, onBack }) {
           <div className="review-app-title-block">
             <h1 className="review-app-name">{detail.app_name}</h1>
             <div className="review-app-meta">
-              <span className="app-stage-badge" style={{ background: stage.bg, color: stage.color }}>
+              <span className="app-stage-badge" style={stage}>
                 {detail.app_stage}
               </span>
-              {detail.is_complete && (
-                <span className="review-status-badge complete">Complete</span>
+              {detail.is_rejected  && <span className="review-status-badge rejected">Rejected</span>}
+              {detail.is_complete  && <span className="review-status-badge complete">Approved</span>}
+              {detail.is_submitted && !detail.is_complete && !detail.is_rejected && (
+                <span className="review-status-badge awaiting">Awaiting approval</span>
               )}
             </div>
           </div>
@@ -142,6 +140,15 @@ export default function ReviewAppPage({ reviewId, onBack }) {
             <textarea className="review-request-text" value={detail.app_request} readOnly />
           </section>
 
+          {detail.owner_message && !detail.is_complete && (
+            <div className={`owner-message-banner ${detail.is_rejected ? 'owner-message-banner--rejected' : ''}`}>
+              <span className="owner-message-label">
+                {detail.is_rejected ? 'Review rejected' : 'Changes requested'}
+              </span>
+              <p className="owner-message-text">{detail.owner_message}</p>
+            </div>
+          )}
+
           <section className="review-section">
             <p className="review-section-label">YOUR FEEDBACK</p>
             <textarea
@@ -149,7 +156,7 @@ export default function ReviewAppPage({ reviewId, onBack }) {
               placeholder="Write your honest, constructive feedback here…"
               value={feedback}
               onChange={e => setFeedback(e.target.value)}
-              disabled={detail.is_complete}
+              disabled={detail.is_complete || detail.is_submitted || detail.is_rejected}
             />
           </section>
 
@@ -162,9 +169,13 @@ export default function ReviewAppPage({ reviewId, onBack }) {
             <button
               className="review-submit-btn"
               onClick={handleSubmit}
-              disabled={saving || detail.is_complete || !feedback.trim()}
+              disabled={saving || detail.is_complete || detail.is_submitted || detail.is_rejected || !feedback.trim()}
             >
-              {saving ? 'Submitting…' : detail.is_complete ? 'Already submitted' : 'Submit review →'}
+              {saving ? 'Submitting…'
+                : detail.is_complete ? 'Approved'
+                : detail.is_rejected ? 'Rejected'
+                : detail.is_submitted ? 'Awaiting approval'
+                : 'Submit review →'}
             </button>
           </div>
         </div>

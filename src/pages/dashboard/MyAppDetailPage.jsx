@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
 import './ReviewAppPage.css'
 import './MyAppDetailPage.css'
+import { STAGE_STYLES } from '../../constants'
 
-const STAGE_STYLES = {
-  'Pre-launch': { bg: '#fef3c7', color: '#92400e' },
-  'Beta':       { bg: '#dbeafe', color: '#1e40af' },
-  'Live':       { bg: '#d1fae5', color: '#065f46' },
-}
-
-export default function MyAppDetailPage({ appId, onBack }) {
+export default function MyAppDetailPage({ appId, onBack, onOpenReview }) {
   const [app, setApp] = useState(null)
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
@@ -48,7 +43,7 @@ export default function MyAppDetailPage({ appId, onBack }) {
           <div className="review-app-title-block">
             <h1 className="review-app-name">{app.name}</h1>
             <div className="review-app-meta">
-              <span className="app-stage-badge" style={{ background: stage.bg, color: stage.color }}>
+              <span className="app-stage-badge" style={stage}>
                 {app.stage}
               </span>
             </div>
@@ -78,7 +73,7 @@ export default function MyAppDetailPage({ appId, onBack }) {
             ) : (
               <div className="feedback-feed">
                 {reviews.map(r => (
-                  <div key={r.id} className="feed-item">
+                  <div key={r.id} className="feed-item" onClick={() => onOpenReview(r.id)} style={{ cursor: 'pointer' }}>
                     <div className="feed-item-header">
                       <div className="feed-avatar">{r.reviewer_username[0].toUpperCase()}</div>
                       <div className="feed-meta">

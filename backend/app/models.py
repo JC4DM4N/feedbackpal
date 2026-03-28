@@ -38,9 +38,12 @@ class Review(Base):
     id           = Column(Integer, primary_key=True, index=True)
     app_id       = Column(Integer, ForeignKey("apps.id",  ondelete="CASCADE"), nullable=False)
     reviewer_id  = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    is_complete  = Column(Boolean, nullable=False, default=False)
-    feedback     = Column(Text, nullable=True)
-    created_date = Column(DateTime(timezone=True), server_default=func.now())
+    is_submitted  = Column(Boolean, nullable=False, default=False)
+    is_complete   = Column(Boolean, nullable=False, default=False)
+    is_rejected   = Column(Boolean, nullable=False, default=False)
+    feedback      = Column(Text, nullable=True)
+    owner_message = Column(Text, nullable=True)
+    created_date  = Column(DateTime(timezone=True), server_default=func.now())
 
 
 class ReviewScreenshot(Base):

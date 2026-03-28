@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ReviewsPage.css'
-
-const STAGE_STYLES = {
-  'Pre-launch': { bg: '#fef3c7', color: '#92400e' },
-  'Beta':       { bg: '#dbeafe', color: '#1e40af' },
-  'Live':       { bg: '#d1fae5', color: '#065f46' },
-}
+import { STAGE_STYLES } from '../../constants'
 
 export default function MyAppsPage({ onOpenApp }) {
   const [apps, setApps] = useState([])

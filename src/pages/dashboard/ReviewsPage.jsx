@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ReviewsPage.css'
-
-const STAGE_STYLES = {
-  'Pre-launch': { bg: '#fef3c7', color: '#92400e' },
-  'Beta':       { bg: '#dbeafe', color: '#1e40af' },
-  'Live':       { bg: '#d1fae5', color: '#065f46' },
-}
+import { STAGE_STYLES } from '../../constants'
 
 export default function ReviewsPage({ onOpenReview }) {
   const [reviews, setReviews] = useState([])
@@ -62,8 +57,8 @@ export default function ReviewsPage({ onOpenReview }) {
                     </span>
                   </td>
                   <td>
-                    <span className={`review-status-badge ${r.is_complete ? 'complete' : 'in-progress'}`}>
-                      {r.is_complete ? 'Complete' : 'In progress'}
+                    <span className={`review-status-badge ${r.is_rejected ? 'rejected' : r.is_complete ? 'complete' : r.is_submitted ? 'awaiting' : 'in-progress'}`}>
+                      {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : 'In progress'}
                     </span>
                   </td>
                   <td className="reviews-date">

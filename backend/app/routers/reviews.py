@@ -117,10 +117,8 @@ def update_review(
 
     if payload.feedback is not None:
         review.feedback = payload.feedback
-    if payload.is_complete is not None:
-        if payload.is_complete and not review.is_complete:
-            app.feedbacks += 1
-        review.is_complete = payload.is_complete
+    if payload.is_submitted is not None:
+        review.is_submitted = payload.is_submitted
 
     db.commit()
     db.refresh(review)
@@ -190,7 +188,9 @@ def _to_out(review: models.Review, app: models.App) -> schemas.ReviewOut:
         id=review.id,
         app_id=review.app_id,
         reviewer_id=review.reviewer_id,
+        is_submitted=review.is_submitted,
         is_complete=review.is_complete,
+        is_rejected=review.is_rejected,
         created_date=review.created_date,
         app_name=app.name,
         app_initials=app.initials,
@@ -204,7 +204,10 @@ def _to_detail(review: models.Review, app: models.App, screenshots: list) -> sch
     return schemas.ReviewDetail(
         id=review.id,
         app_id=review.app_id,
+        is_submitted=review.is_submitted,
         is_complete=review.is_complete,
+        is_rejected=review.is_rejected,
+        owner_message=review.owner_message,
         created_date=review.created_date,
         app_name=app.name,
         app_initials=app.initials,
