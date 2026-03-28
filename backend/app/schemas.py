@@ -88,6 +88,10 @@ class OwnerActionPayload(BaseModel):
     message: str
 
 
+class AppPatch(BaseModel):
+    request: str | None = None
+
+
 class AppReviewFeedItem(BaseModel):
     id: int
     reviewer_username: str

@@ -239,6 +239,46 @@
   box-sizing: border-box;
 }
 
+.review-request-text--editable {
+  background: #fff;
+  cursor: text;
+  resize: vertical;
+  color: #1a1a1a;
+  transition: border-color 0.15s;
+}
+
+.review-request-text--editable:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.save-request-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-request-btn {
+  padding: 8px 18px;
+  background: #0f0e0b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: opacity 0.12s;
+}
+
+.save-request-btn:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.save-request-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ── Feedback textarea ── */
 .review-feedback-input {
   width: 100%;

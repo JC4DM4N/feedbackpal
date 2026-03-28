@@ -53,6 +53,25 @@ def _build_app_outs(apps: list, db: Session) -> list:
     ]
 
 
+@router.patch("/{app_id}", response_model=schemas.AppOut)
+def patch_app(
+    app_id: int,
+    payload: schemas.AppPatch,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    app = db.query(models.App).filter(models.App.id == app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="App not found")
+    if app.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    if payload.request is not None:
+        app.request = payload.request
+    db.commit()
+    db.refresh(app)
+    return _build_app_outs([app], db)[0]
+
+
 @router.get("/mine", response_model=List[schemas.AppOut])
 def list_my_apps(
     db: Session = Depends(get_db),
