@@ -13,9 +13,3 @@ export const PALETTE = [
   '#34d399', '#22d3ee', '#60a5fa', '#a78bfa',
   '#f472b6', '#94a3b8', '#d6bcfa', '#86efac',
 ]
-
-export const SORTS = [
-  { value: 'popular',       label: 'Most viewed' },
-  { value: 'newest',        label: 'Newest first' },
-  { value: 'most-feedback', label: 'Most feedback' },
-]

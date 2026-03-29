@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ExplorePage.css'
-import { STAGE_STYLES, CATEGORIES, STAGES, SORTS } from '../../constants'
+import { STAGE_STYLES, CATEGORIES, STAGES } from '../../constants'
 
 const FILTER_CATEGORIES = ['All', ...CATEGORIES]
 const FILTER_STAGES = ['All', ...STAGES]
@@ -16,7 +16,6 @@ export default function ExplorePage({ onOpenReview, onSubmitApp }) {
   const [search, setSearch] = useState('')
   const [stage, setStage] = useState('All')
   const [category, setCategory] = useState('All')
-  const [sort, setSort] = useState('popular')
   const [reviewApp, setReviewApp] = useState(null)
 
   useEffect(() => {
@@ -44,12 +43,6 @@ export default function ExplorePage({ onOpenReview, onSubmitApp }) {
         app.name.toLowerCase().includes(search.toLowerCase()) ||
         app.description.toLowerCase().includes(search.toLowerCase()))
     )
-    .sort((a, b) => {
-      if (sort === 'popular') return b.approved_count - a.approved_count
-      if (sort === 'newest') return b.id - a.id
-      if (sort === 'most-feedback') return b.feedbacks - a.feedbacks
-      return 0
-    })
 
   return (
     <>
@@ -116,13 +109,6 @@ export default function ExplorePage({ onOpenReview, onSubmitApp }) {
         <div className="explore-results">
           <div className="results-bar">
             <span className="results-count">{filtered.length} apps found</span>
-            <select
-              className="sort-select"
-              value={sort}
-              onChange={e => setSort(e.target.value)}
-            >
-              {SORTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
           </div>
           <div className="app-grid">
             {loading && <p className="no-results">Loading apps…</p>}
