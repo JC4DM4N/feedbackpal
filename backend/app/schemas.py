@@ -88,6 +88,16 @@ class OwnerActionPayload(BaseModel):
     message: str
 
 
+class AppCreate(BaseModel):
+    name: str
+    url: str
+    category: str
+    stage: str
+    description: str
+    request: str
+    color: str
+
+
 class AppPatch(BaseModel):
     name: str | None = None
     url: str | None = None

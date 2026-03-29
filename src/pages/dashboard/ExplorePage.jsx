@@ -14,7 +14,7 @@ function IconSearch() {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
 }
 
-export default function ExplorePage({ onOpenReview }) {
+export default function ExplorePage({ onOpenReview, onSubmitApp }) {
   const [apps, setApps] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -83,7 +83,7 @@ export default function ExplorePage({ onOpenReview }) {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <button className="btn-submit-app">+ Submit your app</button>
+          <button className="btn-submit-app" onClick={onSubmitApp}>+ Submit your app</button>
         </div>
       </div>
 

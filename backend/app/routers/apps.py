@@ -53,6 +53,31 @@ def _build_app_outs(apps: list, db: Session) -> list:
     ]
 
 
+@router.post("/", response_model=schemas.AppOut)
+def create_app(
+    payload: schemas.AppCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    initials = ''.join(w[0].upper() for w in payload.name.split()[:2])
+    app = models.App(
+        owner_id=current_user.id,
+        name=payload.name,
+        initials=initials,
+        color=payload.color,
+        url=payload.url,
+        category=payload.category,
+        stage=payload.stage,
+        description=payload.description,
+        request=payload.request,
+        credits=1,
+    )
+    db.add(app)
+    db.commit()
+    db.refresh(app)
+    return _build_app_outs([app], db)[0]
+
+
 @router.patch("/{app_id}", response_model=schemas.AppOut)
 def patch_app(
     app_id: int,

@@ -8,6 +8,7 @@ import OwnerReviewPage from './OwnerReviewPage'
 import ReviewsPage from './ReviewsPage'
 import ReviewAppPage from './ReviewAppPage'
 import CreditsPage from './CreditsPage'
+import SubmitAppPage from './SubmitAppPage'
 
 const NAV = [
   { id: 'explore',  label: 'Explore' },
@@ -46,14 +47,15 @@ export default function Dashboard({ user, onLogout }) {
     <div className="dashboard">
       <Sidebar page={page} setPage={handleNavChange} user={user} onLogout={onLogout} />
       <main className="dash-main">
-        {page === 'explore'       && <ExplorePage onOpenReview={handleOpenReview} />}
+        {page === 'explore'       && <ExplorePage onOpenReview={handleOpenReview} onSubmitApp={() => setPage('submit-app')} />}
         {page === 'my-apps'       && <MyAppsPage onOpenApp={handleOpenApp} />}
         {page === 'my-app-detail' && <MyAppDetailPage appId={appId} onBack={() => handleNavChange('my-apps')} onOpenReview={handleOpenOwnerReview} />}
         {page === 'owner-review'  && <OwnerReviewPage appId={appId} reviewId={reviewId} onBack={() => setPage('my-app-detail')} />}
         {page === 'reviews'       && <ReviewsPage onOpenReview={handleOpenReview} />}
         {page === 'review-app'    && <ReviewAppPage reviewId={reviewId} onBack={() => handleNavChange('reviews')} />}
         {page === 'credits'       && <CreditsPage />}
-        {page !== 'explore' && page !== 'my-apps' && page !== 'my-app-detail' && page !== 'owner-review' && page !== 'reviews' && page !== 'review-app' && page !== 'credits' && (
+        {page === 'submit-app'    && <SubmitAppPage onBack={() => setPage('explore')} onAppCreated={id => { setAppId(id); setPage('my-app-detail') }} />}
+        {page !== 'explore' && page !== 'my-apps' && page !== 'my-app-detail' && page !== 'owner-review' && page !== 'reviews' && page !== 'review-app' && page !== 'credits' && page !== 'submit-app' && (
           <ComingSoon label={NAV.find(n => n.id === page)?.label} />
         )}
       </main>
