@@ -25,7 +25,7 @@ def _build_app_outs(apps: list, db: Session) -> list:
         db.query(models.Review.app_id, func.count(models.Review.id))
         .filter(
             models.Review.app_id.in_(app_ids),
-            models.Review.is_submitted == True,
+            # models.Review.is_submitted == True,
             models.Review.is_complete == False,
             models.Review.is_rejected == False,
         )
