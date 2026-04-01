@@ -3,6 +3,7 @@ import './ReviewAppPage.css'
 import { STAGE_STYLES } from '../../constants'
 import { OwnerMessageBanner } from '../../components/OwnerMessageBanner'
 import { ImageLightbox } from '../../components/ImageLightbox'
+import { ReviewerDeadlineBanner, OwnerDeadlineBanner } from '../../components/DeadlineBanner'
 
 export default function ReviewAppPage({ reviewId, onBack }) {
   const [detail, setDetail] = useState(null)
@@ -142,6 +143,14 @@ export default function ReviewAppPage({ reviewId, onBack }) {
 
       <div className="review-app-body">
         <div className="review-app-main">
+
+          {!detail.is_complete && !detail.is_rejected && !detail.is_submitted && (
+            <ReviewerDeadlineBanner deadline={detail.reviewer_deadline} />
+          )}
+          {!detail.is_complete && !detail.is_rejected && detail.is_submitted && (
+            <OwnerDeadlineBanner deadline={detail.owner_deadline} />
+          )}
+          
           <section className="review-section">
             <p className="review-section-label">ABOUT THIS APP</p>
             <textarea className="review-request-text" value={detail.app_description} readOnly />

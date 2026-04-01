@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import './ReviewAppPage.css'
 import './OwnerReviewPage.css'
+
 import { AppPageHeader } from '../../components/AppPageHeader'
 import { FeedbackRequestSection } from '../../components/FeedbackRequestSection'
 import { ReviewStatusBadge } from '../../components/ReviewStatusBadge'
 import { OwnerMessageBanner } from '../../components/OwnerMessageBanner'
 import { ActionModal } from '../../components/ActionModal'
 import { ImageLightbox } from '../../components/ImageLightbox'
+import { ReviewerDeadlineBanner, OwnerDeadlineBanner } from '../../components/DeadlineBanner'
 
 export default function OwnerReviewPage({ appId, reviewId, onBack }) {
   const [detail, setDetail] = useState(null)
@@ -77,6 +79,14 @@ export default function OwnerReviewPage({ appId, reviewId, onBack }) {
 
         <div className="review-app-body">
           <div className="review-app-main">
+
+            {!detail.is_submitted && !detail.is_complete && !detail.is_rejected && (
+              <ReviewerDeadlineBanner deadline={detail.reviewer_deadline} isOwnerView />
+            )}
+            {canAct && (
+              <OwnerDeadlineBanner deadline={detail.owner_deadline} isOwnerView />
+            )}
+            
             <FeedbackRequestSection value={detail.app_request} />
 
             <OwnerMessageBanner

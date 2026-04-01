@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -138,6 +140,7 @@ def approve_review(
     reviewer = db.query(models.User).filter(models.User.id == review.reviewer_id).first()
     review.is_complete = True
     review.owner_message = payload.message
+    review.owner_deadline = None
     current_user.escrow_credits -= app.credits
     reviewer.credits += app.credits
     db.commit()
@@ -156,7 +159,10 @@ def request_changes(
 ):
     app, review = _get_owner_review(app_id, review_id, current_user, db)
     review.is_submitted = False
+    review.review_requested = True
     review.owner_message = payload.message
+    review.owner_deadline = None
+    review.reviewer_deadline = datetime.now(timezone.utc) + timedelta(hours=24)
     db.commit()
     db.refresh(review)
     from .reviews import _to_detail
@@ -174,6 +180,7 @@ def reject_review(
     app, review = _get_owner_review(app_id, review_id, current_user, db)
     review.is_rejected = True
     review.owner_message = payload.message
+    review.owner_deadline = None
     current_user.escrow_credits -= app.credits
     current_user.credits += app.credits
     db.commit()
@@ -267,6 +274,8 @@ def get_app_reviews(
             is_rejected=review.is_rejected,
             review_requested=review.review_requested,
             created_date=review.created_date,
+            reviewer_deadline=review.reviewer_deadline,
+            owner_deadline=review.owner_deadline,
         )
         for review, user in rows
     ]

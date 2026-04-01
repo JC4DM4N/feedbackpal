@@ -1,5 +1,6 @@
 import { ReviewStatusBadge } from './ReviewStatusBadge'
 import '../pages/dashboard/MyAppDetailPage.css'
+import { formatTimeRemaining } from '../utils/time'
 
 export function FeedbackFeed({ reviews, onOpenReview }) {
   if (reviews.length === 0) {
@@ -8,7 +9,15 @@ export function FeedbackFeed({ reviews, onOpenReview }) {
 
   return (
     <div className="feedback-feed">
-      {reviews.map(r => (
+      {reviews.map(r => {
+        const timeLeft = r.is_rejected || r.is_complete
+          ? null
+          : r.is_submitted
+            ? formatTimeRemaining(r.owner_deadline)
+            : formatTimeRemaining(r.reviewer_deadline)
+        const deadlineLabel = r.is_submitted ? 'to approve' : 'reviewer has'
+
+        return (
         <div
           key={r.id}
           className="feed-item"
@@ -23,19 +32,27 @@ export function FeedbackFeed({ reviews, onOpenReview }) {
                 {new Date(r.created_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
-            <ReviewStatusBadge
-              is_submitted={r.is_submitted}
-              is_complete={r.is_complete}
-              is_rejected={r.is_rejected}
-              review_requested={r.review_requested}
-            />
+            <div className="feed-item-header-right">
+              <ReviewStatusBadge
+                is_submitted={r.is_submitted}
+                is_complete={r.is_complete}
+                is_rejected={r.is_rejected}
+                review_requested={r.review_requested}
+              />
+              {timeLeft && (
+                <span className="feed-time-left">
+                  {deadlineLabel === 'to approve' ? `${timeLeft} to approve` : `${timeLeft} left`}
+                </span>
+              )}
+            </div>
           </div>
           {r.feedback
             ? <p className="feed-text">{r.feedback}</p>
             : <p className="feed-text feed-text--empty">No feedback written yet.</p>
           }
         </div>
-      ))}
+      )
+      })}
     </div>
   )
 }

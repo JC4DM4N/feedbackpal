@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List
 
@@ -35,7 +36,11 @@ def create_review(
     ).first():
         raise HTTPException(status_code=400, detail="You have already reviewed this app")
 
-    review = models.Review(app_id=payload.app_id, reviewer_id=current_user.id)
+    review = models.Review(
+        app_id=payload.app_id,
+        reviewer_id=current_user.id,
+        reviewer_deadline=datetime.now(timezone.utc) + timedelta(hours=24),
+    )
     db.add(review)
 
     owner = db.query(models.User).filter(models.User.id == app.owner_id).first()
@@ -119,6 +124,9 @@ def update_review(
         review.feedback = payload.feedback
     if payload.is_submitted is not None:
         review.is_submitted = payload.is_submitted
+        if payload.is_submitted:
+            review.reviewer_deadline = None
+            review.owner_deadline = datetime.now(timezone.utc) + timedelta(days=7)
 
     db.commit()
     db.refresh(review)
@@ -197,6 +205,8 @@ def _to_out(review: models.Review, app: models.App) -> schemas.ReviewOut:
         is_rejected=review.is_rejected,
         review_requested=review.review_requested,
         created_date=review.created_date,
+        reviewer_deadline=review.reviewer_deadline,
+        owner_deadline=review.owner_deadline,
         app_name=app.name,
         app_initials=app.initials,
         app_color=app.color,
@@ -215,6 +225,8 @@ def _to_detail(review: models.Review, app: models.App, screenshots: list) -> sch
         review_requested=review.review_requested,
         owner_message=review.owner_message,
         created_date=review.created_date,
+        reviewer_deadline=review.reviewer_deadline,
+        owner_deadline=review.owner_deadline,
         app_name=app.name,
         app_initials=app.initials,
         app_color=app.color,

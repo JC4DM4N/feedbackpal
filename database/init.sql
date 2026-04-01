@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS reviews (
     review_requested   BOOLEAN     NOT NULL DEFAULT FALSE,
     feedback      TEXT,
     owner_message TEXT,
-    created_date  TIMESTAMPTZ DEFAULT NOW()
+    created_date       TIMESTAMPTZ DEFAULT NOW(),
+    reviewer_deadline  TIMESTAMPTZ,          -- reviewer must submit within 24 h
+    owner_deadline     TIMESTAMPTZ           -- owner must approve within 7 days
 );
 
 -- ── Review screenshots ────────────────────────────────────────────────────────

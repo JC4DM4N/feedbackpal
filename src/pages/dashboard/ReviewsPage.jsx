@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './ReviewsPage.css'
 import { STAGE_STYLES } from '../../constants'
+import { formatTimeRemaining } from '../../utils/time'
 
 export default function ReviewsPage({ onOpenReview }) {
   const [reviews, setReviews] = useState([])
@@ -40,32 +41,46 @@ export default function ReviewsPage({ onOpenReview }) {
               </tr>
             </thead>
             <tbody>
-              {reviews.map(r => (
-                <tr key={r.id} onClick={() => onOpenReview(r.id)} style={{ cursor: 'pointer' }}>
-                  <td>
-                    <div className="reviews-app-cell">
-                      <div className="reviews-app-icon" style={{ background: r.app_color }}>{r.app_initials}</div>
-                      <div>
-                        <div className="reviews-app-name">{r.app_name}</div>
-                        <div className="reviews-app-url">{r.app_url}</div>
+              {reviews.map(r => {
+                const timeLeft = r.is_rejected || r.is_complete
+                  ? null
+                  : r.is_submitted
+                    ? formatTimeRemaining(r.owner_deadline)
+                    : formatTimeRemaining(r.reviewer_deadline)
+                const isUrgent = timeLeft && timeLeft.startsWith('0') || (timeLeft && !timeLeft.includes('d') && !timeLeft.includes('h'))
+
+                return (
+                  <tr key={r.id} onClick={() => onOpenReview(r.id)} style={{ cursor: 'pointer' }}>
+                    <td>
+                      <div className="reviews-app-cell">
+                        <div className="reviews-app-icon" style={{ background: r.app_color }}>{r.app_initials}</div>
+                        <div>
+                          <div className="reviews-app-name">{r.app_name}</div>
+                          <div className="reviews-app-url">{r.app_url}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="app-stage-badge" style={STAGE_STYLES[r.app_stage]}>
-                      {r.app_stage}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`review-status-badge ${r.is_rejected ? 'rejected' : r.is_complete ? 'complete' : r.is_submitted ? 'awaiting' : 'in-progress'}`}>
-                      {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : r.review_requested ? 'Review Requested' : 'In progress'}
-                    </span>
-                  </td>
-                  <td className="reviews-date">
-                    {new Date(r.created_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td>
+                      <span className="app-stage-badge" style={STAGE_STYLES[r.app_stage]}>
+                        {r.app_stage}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`review-status-badge ${r.is_rejected ? 'rejected' : r.is_complete ? 'complete' : r.is_submitted ? 'awaiting' : 'in-progress'}`}>
+                        {r.is_rejected ? 'Rejected' : r.is_complete ? 'Approved' : r.is_submitted ? 'Awaiting approval' : r.review_requested ? 'Review Requested' : 'In progress'}
+                      </span>
+                      {timeLeft && (
+                        <span className={`reviews-time-left${isUrgent ? ' reviews-time-left--urgent' : ''}`}>
+                          {timeLeft} left
+                        </span>
+                      )}
+                    </td>
+                    <td className="reviews-date">
+                      {new Date(r.created_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}

@@ -52,6 +52,8 @@ class ReviewOut(BaseModel):
     is_rejected: bool
     review_requested: bool
     created_date: datetime
+    reviewer_deadline: datetime | None
+    owner_deadline: datetime | None
     app_name: str
     app_initials: str
     app_color: str
@@ -68,6 +70,8 @@ class ReviewDetail(BaseModel):
     review_requested: bool
     owner_message: str | None
     created_date: datetime
+    reviewer_deadline: datetime | None
+    owner_deadline: datetime | None
     app_name: str
     app_initials: str
     app_color: str
@@ -125,3 +129,5 @@ class AppReviewFeedItem(BaseModel):
     is_rejected: bool
     review_requested: bool
     created_date: datetime
+    reviewer_deadline: datetime | None
+    owner_deadline: datetime | None

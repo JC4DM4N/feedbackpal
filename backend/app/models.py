@@ -44,7 +44,9 @@ class Review(Base):
     review_requested   = Column(Boolean, nullable=False, default=False)
     feedback      = Column(Text, nullable=True)
     owner_message = Column(Text, nullable=True)
-    created_date  = Column(DateTime(timezone=True), server_default=func.now())
+    created_date       = Column(DateTime(timezone=True), server_default=func.now())
+    reviewer_deadline  = Column(DateTime(timezone=True), nullable=True)
+    owner_deadline     = Column(DateTime(timezone=True), nullable=True)
 
 
 class ReviewScreenshot(Base):
