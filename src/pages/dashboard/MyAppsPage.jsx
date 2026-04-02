@@ -1,21 +1,27 @@
-import { useState, useEffect } from 'react'
-import './ReviewsPage.css'
-import { STAGE_STYLES } from '../../constants'
+import { useState, useEffect } from "react";
+import "./ReviewsPage.css";
+import { STAGE_STYLES } from "../../constants";
 
 export default function MyAppsPage({ onOpenApp }) {
-  const [apps, setApps] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [apps, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    fetch('http://localhost:8000/apps/mine', {
-      headers: { 'Authorization': `Bearer ${token}` },
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:8000/apps/mine", {
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(r => r.json())
-      .then(data => { setApps(data); setLoading(false) })
-      .catch(() => { setError('Failed to load apps'); setLoading(false) })
-  }, [])
+      .then((r) => r.json())
+      .then((data) => {
+        setApps(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load apps");
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="reviews-page">
@@ -41,11 +47,20 @@ export default function MyAppsPage({ onOpenApp }) {
               </tr>
             </thead>
             <tbody>
-              {apps.map(app => (
-                <tr key={app.id} onClick={() => onOpenApp(app.id)} style={{ cursor: 'pointer' }}>
+              {apps.map((app) => (
+                <tr
+                  key={app.id}
+                  onClick={() => onOpenApp(app.id)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>
                     <div className="reviews-app-cell">
-                      <div className="reviews-app-icon" style={{ background: app.color }}>{app.initials}</div>
+                      <div
+                        className="reviews-app-icon"
+                        style={{ background: app.color }}
+                      >
+                        {app.initials}
+                      </div>
                       <div>
                         <div className="reviews-app-name">{app.name}</div>
                         <div className="reviews-app-url">{app.url}</div>
@@ -54,15 +69,22 @@ export default function MyAppsPage({ onOpenApp }) {
                   </td>
                   <td>{app.category}</td>
                   <td>
-                    <span className="app-stage-badge" style={STAGE_STYLES[app.stage]}>
+                    <span
+                      className="app-stage-badge"
+                      style={STAGE_STYLES[app.stage]}
+                    >
                       {app.stage}
                     </span>
                   </td>
                   <td className="reviews-date">{app.approved_count}</td>
                   <td className="reviews-date">
-                    {app.in_progress_count > 0
-                      ? <span className="in-progress-badge">{app.in_progress_count}</span>
-                      : 0}
+                    {app.in_progress_count > 0 ? (
+                      <span className="in-progress-badge">
+                        {app.in_progress_count}
+                      </span>
+                    ) : (
+                      0
+                    )}
                   </td>
                 </tr>
               ))}
@@ -71,5 +93,5 @@ export default function MyAppsPage({ onOpenApp }) {
         )}
       </div>
     </div>
-  )
+  );
 }
