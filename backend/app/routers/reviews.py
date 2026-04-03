@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas, r2
 from ..database import get_db
 from ..dependencies import get_current_user
+from .notifications import create_notification
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
@@ -46,6 +47,12 @@ def create_review(
     owner = db.query(models.User).filter(models.User.id == app.owner_id).first()
     owner.credits -= app.credits
     owner.escrow_credits += app.credits
+
+    create_notification(
+        db, owner.id, "review_started",
+        f"{current_user.username} started reviewing {app.name}",
+        app_id=app.id, review_id=review.id,
+    )
 
     db.commit()
     db.refresh(review)
@@ -127,6 +134,14 @@ def update_review(
         if payload.is_submitted:
             review.reviewer_deadline = None
             review.owner_deadline = datetime.now(timezone.utc) + timedelta(days=7)
+            owner = db.query(models.User).filter(models.User.id == app.owner_id).first()
+            if review.review_requested:
+                msg = f"{current_user.username} resubmitted their review for {app.name}"
+                notif_type = "review_resubmitted"
+            else:
+                msg = f"{current_user.username} submitted their review for {app.name}"
+                notif_type = "review_submitted"
+            create_notification(db, owner.id, notif_type, msg, app_id=app.id, review_id=review.id)
 
     db.commit()
     db.refresh(review)

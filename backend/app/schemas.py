@@ -120,6 +120,16 @@ class UserCredits(BaseModel):
     spent_ever: int
 
 
+class NotificationOut(BaseModel):
+    id: int
+    type: str
+    message: str
+    app_id: int | None
+    review_id: int | None
+    is_read: bool
+    created_at: datetime
+
+
 class AppReviewFeedItem(BaseModel):
     id: int
     reviewer_username: str

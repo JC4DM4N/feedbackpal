@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, SessionLocal
 from . import models
-from .routers import users, auth, apps, reviews
+from .routers import users, auth, apps, reviews, notifications
+from .routers.notifications import create_notification
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -15,8 +16,8 @@ models.Base.metadata.create_all(bind=engine)
 def _expire_reviews():
     """
     Runs every 5 minutes.
-    1. Reviewer deadline expired (not submitted) → delete review, return escrow credits.
-    2. Owner deadline expired (submitted, not actioned) → auto-approve, transfer credits.
+    1. Reviewer deadline expired (not submitted) → delete review, return escrow credits, notify owner.
+    2. Owner deadline expired (submitted, not actioned) → auto-approve, transfer credits, notify reviewer.
     """
     db = SessionLocal()
     try:
@@ -36,11 +37,23 @@ def _expire_reviews():
         )
         for review in expired_reviewer:
             app = db.query(models.App).filter(models.App.id == review.app_id).first()
+            reviewer = db.query(models.User).filter(models.User.id == review.reviewer_id).first()
             if app:
                 owner = db.query(models.User).filter(models.User.id == app.owner_id).first()
                 if owner:
                     owner.escrow_credits -= app.credits
                     owner.credits += app.credits
+                    create_notification(
+                        db, owner.id, "reviewer_deadline_expired",
+                        f"A reviewer did not submit their review of {app.name} in time — your credit has been returned.",
+                        app_id=app.id,
+                    )
+                if reviewer:
+                    create_notification(
+                        db, reviewer.id, "reviewer_deadline_expired",
+                        f"Your review of {app.name} was removed because the 24-hour deadline passed without submission.",
+                        app_id=app.id,
+                    )
             db.delete(review)
 
         # ── Expired owner deadlines (auto-approve) ────────────────────────────
@@ -63,6 +76,16 @@ def _expire_reviews():
                 if owner and reviewer:
                     owner.escrow_credits -= app.credits
                     reviewer.credits += app.credits
+                    create_notification(
+                        db, reviewer.id, "owner_deadline_expired",
+                        f"Your review of {app.name} was auto-approved after 7 days — credit earned.",
+                        app_id=app.id, review_id=review.id,
+                    )
+                    create_notification(
+                        db, owner.id, "owner_deadline_expired",
+                        f"Your 7-day window to approve the review of {app.name} passed — it was auto-approved.",
+                        app_id=app.id, review_id=review.id,
+                    )
             review.is_complete = True
             review.owner_deadline = None
 
@@ -96,6 +119,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(apps.router)
 app.include_router(reviews.router)
+app.include_router(notifications.router)
 
 
 @app.get("/health")

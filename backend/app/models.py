@@ -49,6 +49,19 @@ class Review(Base):
     owner_deadline     = Column(DateTime(timezone=True), nullable=True)
 
 
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id        = Column(Integer, primary_key=True, index=True)
+    user_id   = Column(Integer, ForeignKey("users.id",    ondelete="CASCADE"), nullable=False)
+    type      = Column(String(50), nullable=False)
+    message   = Column(Text, nullable=False)
+    app_id    = Column(Integer, ForeignKey("apps.id",     ondelete="CASCADE"), nullable=True)
+    review_id = Column(Integer, ForeignKey("reviews.id",  ondelete="CASCADE"), nullable=True)
+    is_read   = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class ReviewScreenshot(Base):
     __tablename__ = "review_screenshots"
 

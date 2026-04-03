@@ -8,6 +8,7 @@ from typing import List
 from .. import models, schemas
 from ..database import get_db
 from ..dependencies import get_current_user
+from .notifications import create_notification
 
 router = APIRouter(prefix="/apps", tags=["apps"])
 
@@ -143,6 +144,11 @@ def approve_review(
     review.owner_deadline = None
     current_user.escrow_credits -= app.credits
     reviewer.credits += app.credits
+    create_notification(
+        db, reviewer.id, "review_approved",
+        f"{current_user.username} approved your review of {app.name}",
+        app_id=app.id, review_id=review.id,
+    )
     db.commit()
     db.refresh(review)
     from .reviews import _to_detail
@@ -158,11 +164,17 @@ def request_changes(
     current_user: models.User = Depends(get_current_user),
 ):
     app, review = _get_owner_review(app_id, review_id, current_user, db)
+    reviewer = db.query(models.User).filter(models.User.id == review.reviewer_id).first()
     review.is_submitted = False
     review.review_requested = True
     review.owner_message = payload.message
     review.owner_deadline = None
     review.reviewer_deadline = datetime.now(timezone.utc) + timedelta(hours=24)
+    create_notification(
+        db, reviewer.id, "changes_requested",
+        f"{current_user.username} requested changes on your review of {app.name}",
+        app_id=app.id, review_id=review.id,
+    )
     db.commit()
     db.refresh(review)
     from .reviews import _to_detail
@@ -178,11 +190,17 @@ def reject_review(
     current_user: models.User = Depends(get_current_user),
 ):
     app, review = _get_owner_review(app_id, review_id, current_user, db)
+    reviewer = db.query(models.User).filter(models.User.id == review.reviewer_id).first()
     review.is_rejected = True
     review.owner_message = payload.message
     review.owner_deadline = None
     current_user.escrow_credits -= app.credits
     current_user.credits += app.credits
+    create_notification(
+        db, reviewer.id, "review_rejected",
+        f"{current_user.username} rejected your review of {app.name}",
+        app_id=app.id, review_id=review.id,
+    )
     db.commit()
     db.refresh(review)
     from .reviews import _to_detail

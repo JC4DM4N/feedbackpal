@@ -59,6 +59,18 @@ CREATE TABLE IF NOT EXISTS reviews (
     owner_deadline     TIMESTAMPTZ           -- owner must approve within 7 days
 );
 
+-- ── Notifications ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS notifications (
+    id          SERIAL PRIMARY KEY,
+    user_id     INTEGER      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type        VARCHAR(50)  NOT NULL,
+    message     TEXT         NOT NULL,
+    app_id      INTEGER      REFERENCES apps(id)    ON DELETE CASCADE,
+    review_id   INTEGER      REFERENCES reviews(id) ON DELETE CASCADE,
+    is_read     BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMPTZ  DEFAULT NOW()
+);
+
 -- ── Review screenshots ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS review_screenshots (
     id          SERIAL PRIMARY KEY,

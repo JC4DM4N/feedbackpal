@@ -21,7 +21,7 @@ export default function ReviewAppPage({ reviewId, onBack }) {
     fetch(`http://localhost:8000/reviews/${reviewId}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error(); return r.json() })
       .then(data => {
         setDetail(data)
         setFeedback(data.feedback || '')

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Dashboard.css'
 import Sidebar from '../../components/Sidebar'
 import ExplorePage from './ExplorePage'
@@ -9,6 +9,7 @@ import ReviewsPage from './ReviewsPage'
 import ReviewAppPage from './ReviewAppPage'
 import CreditsPage from './CreditsPage'
 import SubmitAppPage from './SubmitAppPage'
+import NotificationsPage from './NotificationsPage'
 
 const NAV = [
   { id: 'explore',  label: 'Explore' },
@@ -21,6 +22,17 @@ export default function Dashboard({ user, onLogout }) {
   const [page, setPage] = useState('explore')
   const [reviewId, setReviewId] = useState(null)
   const [appId, setAppId] = useState(null)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    fetch('http://localhost:8000/notifications/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(data => setUnreadCount(data.filter(n => !n.is_read).length))
+      .catch(() => {})
+  }, [page])
 
   function handleOpenReview(id) {
     setReviewId(id)
@@ -45,7 +57,7 @@ export default function Dashboard({ user, onLogout }) {
 
   return (
     <div className="dashboard">
-      <Sidebar page={page} setPage={handleNavChange} user={user} onLogout={onLogout} />
+      <Sidebar page={page} setPage={handleNavChange} user={user} onLogout={onLogout} unreadCount={unreadCount} />
       <main className="dash-main">
         {page === 'explore'       && <ExplorePage onOpenReview={handleOpenReview} onSubmitApp={() => setPage('submit-app')} />}
         {page === 'my-apps'       && <MyAppsPage onOpenApp={handleOpenApp} />}
@@ -53,9 +65,17 @@ export default function Dashboard({ user, onLogout }) {
         {page === 'owner-review'  && <OwnerReviewPage appId={appId} reviewId={reviewId} onBack={() => setPage('my-app-detail')} />}
         {page === 'reviews'       && <ReviewsPage onOpenReview={handleOpenReview} />}
         {page === 'review-app'    && <ReviewAppPage reviewId={reviewId} onBack={() => handleNavChange('reviews')} />}
-        {page === 'credits'       && <CreditsPage />}
-        {page === 'submit-app'    && <SubmitAppPage onBack={() => setPage('explore')} onAppCreated={id => { setAppId(id); setPage('my-app-detail') }} />}
-        {page !== 'explore' && page !== 'my-apps' && page !== 'my-app-detail' && page !== 'owner-review' && page !== 'reviews' && page !== 'review-app' && page !== 'credits' && page !== 'submit-app' && (
+        {page === 'credits'        && <CreditsPage />}
+        {page === 'submit-app'     && <SubmitAppPage onBack={() => setPage('explore')} onAppCreated={id => { setAppId(id); setPage('my-app-detail') }} />}
+        {page === 'notifications'  && (
+          <NotificationsPage
+            onOpenReview={id => { setReviewId(id); setPage('review-app') }}
+            onOpenOwnerReview={(reviewId, appId) => { setReviewId(reviewId); setAppId(appId); setPage('owner-review') }}
+            onOpenApp={id => { setAppId(id); setPage('my-app-detail') }}
+            onRead={() => setUnreadCount(c => Math.max(0, c - 1))}
+          />
+        )}
+        {page !== 'explore' && page !== 'my-apps' && page !== 'my-app-detail' && page !== 'owner-review' && page !== 'reviews' && page !== 'review-app' && page !== 'credits' && page !== 'submit-app' && page !== 'notifications' && (
           <ComingSoon label={NAV.find(n => n.id === page)?.label} />
         )}
       </main>
