@@ -7,6 +7,9 @@
   </mj-head>
   <mj-body background-color="#f4f3ec">
 
+    <!-- Spacer -->
+    <mj-section padding="32px 0 0" />
+
     <!-- Card -->
     <mj-section background-color="#ffffff" border-radius="16px" border="1px solid #e5e4e7" padding="32px 32px 36px">
       <mj-column>
@@ -18,17 +21,17 @@
         </mj-text>
 
         <mj-text align="center" color="#6b6375" padding-bottom="24px">
-          Hi {{username}}, the app owner has reviewed your submission and is asking for some changes before approving.
+          Hi {DATA_VARIABLE:username}, the app owner has reviewed your submission and is asking for some changes before approving.
         </mj-text>
 
         <!-- Notification callout -->
         <mj-text align="center" color="#08060d" font-size="15px" font-weight="500" padding="0 0 32px">
           <div style="background:#fffbeb; border-radius:10px; padding:16px 20px;">
-            ✏️ {{message}}
+            ✏️ {DATA_VARIABLE:message}
           </div>
         </mj-text>
 
-        <mj-button href="{{actionUrl}}" background-color="#aa3bff" color="#ffffff" border-radius="9px" font-size="15px" font-weight="600" padding="14px 28px">
+        <mj-button href="{DATA_VARIABLE:actionUrl}" background-color="#aa3bff" color="#ffffff" border-radius="9px" font-size="15px" font-weight="600" padding="14px 28px">
           View feedback
         </mj-button>
 

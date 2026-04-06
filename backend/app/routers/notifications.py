@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import models, schemas, loops
 from ..database import get_db
 from ..dependencies import get_current_user
 
@@ -49,7 +49,15 @@ def mark_all_read(
     db.commit()
 
 
-def create_notification(db: Session, user_id: int, type: str, message: str, app_id: int = None, review_id: int = None):
+def create_notification(
+    db: Session,
+    user_id: int,
+    type: str,
+    message: str,
+    app_id: int = None,
+    review_id: int = None,
+    action_url: str = None,
+):
     n = models.Notification(
         user_id=user_id,
         type=type,
@@ -58,3 +66,13 @@ def create_notification(db: Session, user_id: int, type: str, message: str, app_
         review_id=review_id,
     )
     db.add(n)
+
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user and action_url:
+        loops.send_notification_email(
+            email=user.email,
+            username=user.username,
+            notification_type=type,
+            message=message,
+            action_url=action_url,
+        )

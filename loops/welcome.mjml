@@ -7,6 +7,9 @@
   </mj-head>
   <mj-body background-color="#f4f3ec">
 
+    <!-- Spacer -->
+    <mj-section padding="32px 0 0" />
+
     <!-- Card -->
     <mj-section background-color="#ffffff" border-radius="16px" border="1px solid #e5e4e7" padding="32px 32px 36px">
       <mj-column>
@@ -14,7 +17,7 @@
 
 
         <mj-text font-size="36px" font-weight="800" color="#08060d" letter-spacing="-1px" align="center" padding-bottom="8px">
-          Welcome, {{username}}!
+          Welcome, {DATA_VARIABLE:username}!
         </mj-text>
 
         <mj-text align="center" color="#6b6375" padding-bottom="12px">

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 
-from .. import models, schemas
+from .. import models, schemas, loops
 from ..database import get_db
 from ..dependencies import get_current_user
 from .notifications import create_notification
@@ -148,6 +148,7 @@ def approve_review(
         db, reviewer.id, "review_approved",
         f"{current_user.username} approved your review of {app.name}",
         app_id=app.id, review_id=review.id,
+        action_url=f"{loops.FRONTEND_URL}/reviews/{review.id}",
     )
     db.commit()
     db.refresh(review)
@@ -174,6 +175,7 @@ def request_changes(
         db, reviewer.id, "changes_requested",
         f"{current_user.username} requested changes on your review of {app.name}",
         app_id=app.id, review_id=review.id,
+        action_url=f"{loops.FRONTEND_URL}/reviews/{review.id}",
     )
     db.commit()
     db.refresh(review)
@@ -200,6 +202,7 @@ def reject_review(
         db, reviewer.id, "review_rejected",
         f"{current_user.username} rejected your review of {app.name}",
         app_id=app.id, review_id=review.id,
+        action_url=f"{loops.FRONTEND_URL}/reviews/{review.id}",
     )
     db.commit()
     db.refresh(review)

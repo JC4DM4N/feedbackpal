@@ -17,7 +17,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-me-before-production")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
 
-LOOPS_PASSWORD_RESET_ID = "cmnls89p70wug0ix02cwxhqhr"
+LOOPS_PASSWORD_RESET_ID = loops.ID_RESET_PASSWORD
+LOOPS_WELCOME_ID = loops.ID_WELCOME
 
 
 class RegisterRequest(BaseModel):
@@ -63,6 +64,12 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
     expire = datetime.now(timezone.utc) + timedelta(hours=TOKEN_EXPIRE_HOURS)
     token = jwt.encode({"sub": str(user.id), "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
+
+    loops.send_transactional(
+        email=user.email,
+        transactional_id=LOOPS_WELCOME_ID,
+        data_variables={"username": user.username},
+    )
 
     return TokenResponse(
         access_token=token,

@@ -9,6 +9,7 @@ from .database import engine, SessionLocal
 from . import models
 from .routers import users, auth, apps, reviews, notifications
 from .routers.notifications import create_notification
+from . import loops
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -47,12 +48,14 @@ def _expire_reviews():
                         db, owner.id, "reviewer_deadline_expired",
                         f"A reviewer did not submit their review of {app.name} in time — your credit has been returned.",
                         app_id=app.id,
+                        action_url=f"{loops.FRONTEND_URL}/my-apps/{app.id}",
                     )
                 if reviewer:
                     create_notification(
                         db, reviewer.id, "reviewer_deadline_expired",
                         f"Your review of {app.name} was removed because the 24-hour deadline passed without submission.",
                         app_id=app.id,
+                        action_url=f"{loops.FRONTEND_URL}/reviews",
                     )
             db.delete(review)
 
@@ -80,11 +83,13 @@ def _expire_reviews():
                         db, reviewer.id, "owner_deadline_expired",
                         f"Your review of {app.name} was auto-approved after 7 days — credit earned.",
                         app_id=app.id, review_id=review.id,
+                        action_url=f"{loops.FRONTEND_URL}/reviews/{review.id}",
                     )
                     create_notification(
                         db, owner.id, "owner_deadline_expired",
                         f"Your 7-day window to approve the review of {app.name} passed — it was auto-approved.",
                         app_id=app.id, review_id=review.id,
+                        action_url=f"{loops.FRONTEND_URL}/my-apps/{app.id}/reviews/{review.id}",
                     )
             review.is_complete = True
             review.owner_deadline = None

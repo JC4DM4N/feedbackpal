@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, r2
+from .. import models, schemas, r2, loops
 from ..database import get_db
 from ..dependencies import get_current_user
 from .notifications import create_notification
@@ -52,6 +52,7 @@ def create_review(
         db, owner.id, "review_started",
         f"{current_user.username} started reviewing {app.name}",
         app_id=app.id, review_id=review.id,
+        action_url=f"{loops.FRONTEND_URL}/my-apps/{app.id}",
     )
 
     db.commit()
@@ -141,7 +142,11 @@ def update_review(
             else:
                 msg = f"{current_user.username} submitted their review for {app.name}"
                 notif_type = "review_submitted"
-            create_notification(db, owner.id, notif_type, msg, app_id=app.id, review_id=review.id)
+            create_notification(
+                db, owner.id, notif_type, msg,
+                app_id=app.id, review_id=review.id,
+                action_url=f"{loops.FRONTEND_URL}/my-apps/{app.id}/reviews/{review.id}",
+            )
 
     db.commit()
     db.refresh(review)
