@@ -203,14 +203,18 @@ function ReviewModal({ app, onClose, onReviewCreated }) {
             <div className="modal-url">{app.url}</div>
           </div>
         </div>
-        {app.description && (
-          <>
-            <p className="modal-section-label">ABOUT THIS APP</p>
-            <p className="modal-description">{app.description}</p>
-          </>
-        )}
-        <p className="modal-section-label">WHAT THE DEVELOPER IS LOOKING FOR</p>
-        <textarea className="modal-request" value={app.request} readOnly />
+        <div className="modal-scroll-body">
+          {app.description && (
+            <>
+              <p className="modal-section-label">ABOUT THIS APP</p>
+              <p className="modal-description">{app.description}</p>
+            </>
+          )}
+          <p className="modal-section-label">WHAT THE DEVELOPER IS LOOKING FOR</p>
+          <div className="modal-request">
+            {app.request}
+          </div>
+        </div>
         {error && <p className="modal-error">{error}</p>}
         <div className="modal-actions">
           <button className="modal-btn-cancel" onClick={onClose}>Cancel</button>
