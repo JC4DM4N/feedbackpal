@@ -112,17 +112,12 @@ export default function OwnerReviewPage() {
 
             {canAct && (
               <div className="review-app-actions">
-                <button className="owner-reject-btn" onClick={() => setModal('reject')}>
-                  Reject review
+                <button className="owner-request-btn" onClick={() => setModal('request-changes')}>
+                  Request changes
                 </button>
-                <div className="owner-right-actions">
-                  <button className="owner-request-btn" onClick={() => setModal('request-changes')}>
-                    Request changes
-                  </button>
-                  <button className="owner-approve-btn" onClick={() => setModal('approve')}>
-                    Approve review →
-                  </button>
-                </div>
+                <button className="owner-approve-btn" onClick={() => setModal('approve')}>
+                  Approve review →
+                </button>
               </div>
             )}
           </div>

@@ -365,7 +365,7 @@
 .review-app-actions {
   display: flex;
   gap: 10px;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding-top: 4px;
 }
