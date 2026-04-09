@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS apps (
     description TEXT       NOT NULL,
     request     TEXT       NOT NULL,
     credits   INTEGER      NOT NULL DEFAULT 1,
+    is_hidden BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

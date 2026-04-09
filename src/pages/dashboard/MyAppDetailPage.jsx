@@ -21,6 +21,11 @@ export default function MyAppDetailPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
 
+  const [toggling, setToggling] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     Promise.all([
@@ -89,6 +94,48 @@ export default function MyAppDetailPage() {
     return e => setEditFields(prev => ({ ...prev, [key]: e.target.value }))
   }
 
+  async function handleToggleHidden() {
+    setToggling(true)
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch(`/apps/${appId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ is_hidden: !app.is_hidden }),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setApp(updated)
+      }
+    } finally {
+      setToggling(false)
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch(`/apps/${appId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (res.ok) {
+        navigate('/my-apps')
+      } else {
+        const data = await res.json()
+        setDeleteError(data.detail || 'Failed to delete')
+        setConfirmDelete(false)
+      }
+    } catch {
+      setDeleteError('Could not connect to server')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) return <div className="review-app-loading">Loading…</div>
   if (error) return <div className="review-app-loading">{error}</div>
 
@@ -111,7 +158,24 @@ export default function MyAppDetailPage() {
               </button>
             </>
           ) : (
-            <button className="edit-app-btn" onClick={handleEdit}>Edit</button>
+            <>
+              {deleteError && <p className="edit-form-error">{deleteError}</p>}
+              {confirmDelete ? (
+                <>
+                  <span className="delete-confirm-label">Are you sure? This cannot be undone.</span>
+                  <button className="delete-cancel-btn" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                  <button className="delete-confirm-btn" onClick={handleDelete} disabled={deleting}>
+                    {deleting ? 'Deleting…' : 'Yes, delete'}
+                  </button>
+                </>
+              ) : (
+                <button className="delete-app-btn" onClick={() => setConfirmDelete(true)}>Delete app</button>
+              )}
+              <button className="app-visibility-btn" onClick={handleToggleHidden} disabled={toggling}>
+                {app.is_hidden ? 'Show in feed' : 'Hide from feed'}
+              </button>
+              <button className="edit-app-btn" onClick={handleEdit}>Edit</button>
+            </>
           )
         }
       />

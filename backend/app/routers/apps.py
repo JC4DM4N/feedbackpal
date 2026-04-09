@@ -49,6 +49,7 @@ def _build_app_outs(apps: list, db: Session) -> list:
             description=a.description,
             request=a.request,
             credits=a.credits,
+            is_hidden=a.is_hidden,
             approved_count=approved.get(a.id, 0),
             in_progress_count=in_progress.get(a.id, 0),
         )
@@ -93,7 +94,7 @@ def patch_app(
         raise HTTPException(status_code=404, detail="App not found")
     if app.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
-    for field in ('name', 'url', 'category', 'stage', 'description', 'request', 'color'):
+    for field in ('name', 'url', 'category', 'stage', 'description', 'request', 'color', 'is_hidden'):
         value = getattr(payload, field)
         if value is not None:
             setattr(app, field, value)
@@ -125,7 +126,7 @@ def list_apps(db: Session = Depends(get_db)):
         for u in db.query(models.User).filter(models.User.id.in_(owner_ids)).all()
     }
 
-    visible_apps = [a for a in all_apps if owner_available.get(a.owner_id, 0) > 0]
+    visible_apps = [a for a in all_apps if owner_available.get(a.owner_id, 0) > 0 and not a.is_hidden]
     return _build_app_outs(visible_apps, db)
 
 
@@ -300,6 +301,21 @@ def get_app_reviews(
         )
         for review, user in rows
     ]
+
+
+@router.delete("/{app_id}", status_code=204)
+def delete_app(
+    app_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    app = db.query(models.App).filter(models.App.id == app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="App not found")
+    if app.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    db.delete(app)
+    db.commit()
 
 
 @router.get("/{app_id}", response_model=schemas.AppOut)

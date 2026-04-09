@@ -46,6 +46,7 @@ export default function MyAppsPage() {
                 <th>Stage</th>
                 <th>Feedback</th>
                 <th>Feedback In Progress</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -87,6 +88,9 @@ export default function MyAppsPage() {
                     ) : (
                       0
                     )}
+                  </td>
+                  <td className="reviews-date">
+                    {app.is_hidden && <span className="hidden-badge">hidden</span>}
                   </td>
                 </tr>
               ))}

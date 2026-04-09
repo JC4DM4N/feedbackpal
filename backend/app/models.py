@@ -29,6 +29,7 @@ class App(Base):
     description = Column(Text, nullable=False)
     request     = Column(Text, nullable=False)
     credits = Column(Integer, nullable=False, default=1)
+    is_hidden = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 

@@ -37,6 +37,7 @@ class AppOut(BaseModel):
     description: str
     request: str
     credits: int
+    is_hidden: bool
     approved_count: int
     in_progress_count: int
 
@@ -110,6 +111,7 @@ class AppPatch(BaseModel):
     description: str | None = None
     request: str | None = None
     color: str | None = None
+    is_hidden: bool | None = None
 
 
 class UserCredits(BaseModel):
