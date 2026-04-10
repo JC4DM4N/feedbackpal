@@ -42,10 +42,10 @@ export default function MyAppsPage() {
             <thead>
               <tr>
                 <th>App</th>
-                <th>Category</th>
+                <th className="col-hide-mobile">Category</th>
                 <th>Stage</th>
                 <th>Feedback</th>
-                <th>Feedback In Progress</th>
+                <th className="col-hide-mobile">In Progress</th>
                 <th></th>
               </tr>
             </thead>
@@ -70,7 +70,7 @@ export default function MyAppsPage() {
                       </div>
                     </div>
                   </td>
-                  <td>{app.category}</td>
+                  <td className="col-hide-mobile">{app.category}</td>
                   <td>
                     <span
                       className="app-stage-badge"
@@ -80,7 +80,7 @@ export default function MyAppsPage() {
                     </span>
                   </td>
                   <td className="reviews-date">{app.approved_count}</td>
-                  <td className="reviews-date">
+                  <td className="reviews-date col-hide-mobile">
                     {app.in_progress_count > 0 ? (
                       <span className="in-progress-badge">
                         {app.in_progress_count}
