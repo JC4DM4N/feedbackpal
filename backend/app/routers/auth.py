@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import bcrypt as bcryptlib
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from jose import jwt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -81,11 +82,12 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
+    identifier = payload.identifier.lower()
     user = (
         db.query(models.User)
         .filter(
-            (models.User.email == payload.identifier) |
-            (models.User.username == payload.identifier)
+            (models.User.email == identifier) |
+            (func.lower(models.User.username) == identifier)
         )
         .first()
     )
