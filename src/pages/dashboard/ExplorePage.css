@@ -269,16 +269,35 @@
   }
 
   .app-card-header {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 6px;
+    align-items: center;
   }
 
-  .app-category-tag {
-    order: 3;
-    margin-left: 56px;
+  .app-icon {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: start;
+  }
+
+  .app-name-block {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .app-visit-btn {
+    grid-column: 3;
+    grid-row: 1;
     margin-left: 0;
+  }
+
+  .app-category-tag {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
   }
 
   .modal-overlay {
