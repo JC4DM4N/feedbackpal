@@ -8,6 +8,7 @@ import { FeedbackRequestSection } from '../../components/FeedbackRequestSection'
 import { ReviewStatusBadge } from '../../components/ReviewStatusBadge'
 import { OwnerMessageBanner } from '../../components/OwnerMessageBanner'
 import { ActionModal } from '../../components/ActionModal'
+import { authFetch } from '../../utils/authFetch'
 import { ImageLightbox } from '../../components/ImageLightbox'
 import { ReviewerDeadlineBanner, OwnerDeadlineBanner } from '../../components/DeadlineBanner'
 
@@ -22,7 +23,7 @@ export default function OwnerReviewPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    fetch(`/apps/${appId}/reviews/${reviewId}`, {
+    authFetch(`/apps/${appId}/reviews/${reviewId}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.json())
@@ -32,7 +33,7 @@ export default function OwnerReviewPage() {
 
   async function handleAction(action, message) {
     const token = localStorage.getItem('token')
-    const res = await fetch(`/apps/${appId}/reviews/${reviewId}/${action}`, {
+    const res = await authFetch(`/apps/${appId}/reviews/${reviewId}/${action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ message }),

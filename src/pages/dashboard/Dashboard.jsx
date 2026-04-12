@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import './Dashboard.css'
 import Sidebar from '../../components/Sidebar'
+import { authFetch } from '../../utils/authFetch'
 
 function IconMenu() {
   return (
@@ -24,7 +25,7 @@ export default function Dashboard({ user, onLogout }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    fetch('/notifications/me', {
+    authFetch('/notifications/me', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.json())

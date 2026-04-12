@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import LandingPage from './pages/landing/LandingPage'
 import LoginPage from './pages/login/LoginPage'
@@ -37,6 +37,11 @@ function App() {
     localStorage.removeItem('user')
     setUser(null)
   }
+
+  useEffect(() => {
+    window.addEventListener('auth:expired', handleLogout)
+    return () => window.removeEventListener('auth:expired', handleLogout)
+  }, [])
 
   // Redirects to /explore if already logged in
   function PublicOnly({ children }) {

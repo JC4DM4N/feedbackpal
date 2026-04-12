@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import './ReviewsPage.css'
 import { STAGE_STYLES } from '../../constants'
 import { formatTimeRemaining } from '../../utils/time'
+import { authFetch } from '../../utils/authFetch'
 
 export default function ReviewsPage() {
   const navigate = useNavigate()
@@ -12,7 +13,7 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    fetch('/reviews/me', {
+    authFetch('/reviews/me', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.json())

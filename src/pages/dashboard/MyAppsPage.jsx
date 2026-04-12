@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ReviewsPage.css";
 import { STAGE_STYLES } from "../../constants";
+import { authFetch } from "../../utils/authFetch";
 
 export default function MyAppsPage() {
   const navigate = useNavigate()
@@ -11,7 +12,7 @@ export default function MyAppsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("/apps/mine", {
+    authFetch("/apps/mine", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

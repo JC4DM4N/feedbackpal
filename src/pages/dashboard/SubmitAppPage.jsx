@@ -4,6 +4,7 @@ import './ReviewAppPage.css'
 import './MyAppDetailPage.css'
 import './SubmitAppPage.css'
 import { STAGE_STYLES, CATEGORIES, STAGES, PALETTE } from '../../constants'
+import { authFetch } from '../../utils/authFetch'
 
 export default function SubmitAppPage() {
   const navigate = useNavigate()
@@ -37,7 +38,7 @@ export default function SubmitAppPage() {
     setError(null)
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('/apps/', {
+      const res = await authFetch('/apps/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(fields),

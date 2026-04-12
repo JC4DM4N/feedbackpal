@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ExplorePage.css";
 import { STAGE_STYLES, CATEGORIES, STAGES } from "../../constants";
+import { authFetch } from "../../utils/authFetch";
 
 const FILTER_CATEGORIES = ["All", ...CATEGORIES];
 const FILTER_STAGES = ["All", ...STAGES];
@@ -37,8 +38,8 @@ export default function ExplorePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     Promise.all([
-      fetch("/apps/").then((r) => r.json()),
-      fetch("/reviews/me", {
+      authFetch("/apps/").then((r) => r.json()),
+      authFetch("/reviews/me", {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => r.json()),
     ])
@@ -231,7 +232,7 @@ function ReviewModal({ app, onClose, onReviewCreated }) {
     setError(null);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/reviews/", {
+      const res = await authFetch("/reviews/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

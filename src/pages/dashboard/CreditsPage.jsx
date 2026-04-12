@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './CreditsPage.css'
+import { authFetch } from '../../utils/authFetch'
 
 export default function CreditsPage() {
   const [data, setData] = useState(null)
@@ -7,7 +8,7 @@ export default function CreditsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    fetch('/users/me/credits', {
+    authFetch('/users/me/credits', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.json())

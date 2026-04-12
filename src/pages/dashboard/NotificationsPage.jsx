@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import './NotificationsPage.css'
+import { authFetch } from '../../utils/authFetch'
 
 const TYPE_ICONS = {
   review_started:            '🔔',
@@ -27,7 +28,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    fetch('/notifications/me', {
+    authFetch('/notifications/me', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.json())
@@ -39,7 +40,7 @@ export default function NotificationsPage() {
     if (DEAD_END_TYPES.has(n.type)) return
     if (!n.is_read) {
       const token = localStorage.getItem('token')
-      fetch(`/notifications/${n.id}/read`, {
+      authFetch(`/notifications/${n.id}/read`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
       }).catch(() => {})

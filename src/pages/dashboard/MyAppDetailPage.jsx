@@ -7,6 +7,7 @@ import { AppPageHeader } from '../../components/AppPageHeader'
 import { FeedbackRequestSection } from '../../components/FeedbackRequestSection'
 import { FeedbackFeed } from '../../components/FeedbackFeed'
 import { CATEGORIES, STAGES, PALETTE } from '../../constants'
+import { authFetch } from '../../utils/authFetch'
 
 export default function MyAppDetailPage() {
   const { appId } = useParams()
@@ -29,10 +30,10 @@ export default function MyAppDetailPage() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     Promise.all([
-      fetch(`/apps/${appId}`, {
+      authFetch(`/apps/${appId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       }).then(r => r.json()),
-      fetch(`/apps/${appId}/reviews`, {
+      authFetch(`/apps/${appId}/reviews`, {
         headers: { 'Authorization': `Bearer ${token}` },
       }).then(r => r.json()),
     ])
@@ -69,7 +70,7 @@ export default function MyAppDetailPage() {
     setSaveError(null)
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`/apps/${appId}`, {
+      const res = await authFetch(`/apps/${appId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(editFields),
@@ -98,7 +99,7 @@ export default function MyAppDetailPage() {
     setToggling(true)
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`/apps/${appId}`, {
+      const res = await authFetch(`/apps/${appId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ is_hidden: !app.is_hidden }),
@@ -117,7 +118,7 @@ export default function MyAppDetailPage() {
     setDeleteError(null)
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`/apps/${appId}`, {
+      const res = await authFetch(`/apps/${appId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       })
