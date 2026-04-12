@@ -269,30 +269,27 @@
   }
 
   .app-card-header {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    column-gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-start;
     row-gap: 8px;
-    align-items: start;
   }
 
   .app-icon {
-    grid-column: 1;
-    grid-row: 1;
+    flex-shrink: 0;
+    align-self: flex-start;
   }
 
   .app-name-block {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
+    flex: 1;
+    min-width: 0;
   }
 
-  /* Meta (category + visit) drops to row 2 under the name */
+  /* Force meta to its own line, indented to sit under the name */
   .app-card-meta {
-    grid-column: 2;
-    grid-row: 2;
+    flex-basis: 100%;
     margin-left: 0;
-    flex-wrap: wrap;
+    padding-left: 56px; /* 44px icon + 12px gap */
+    justify-content: flex-start;
   }
 
   .app-review-btn {
@@ -330,6 +327,9 @@
   flex-direction: column;
   gap: 14px;
   transition: box-shadow 0.15s, transform 0.15s;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .app-card:hover {
