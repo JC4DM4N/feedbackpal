@@ -50,6 +50,7 @@ def _build_app_outs(apps: list, db: Session) -> list:
             request=a.request,
             credits=a.credits,
             is_hidden=a.is_hidden,
+            is_multi_review=a.is_multi_review,
             approved_count=approved.get(a.id, 0),
             in_progress_count=in_progress.get(a.id, 0),
         )

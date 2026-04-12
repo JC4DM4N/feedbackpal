@@ -44,11 +44,19 @@ export default function ExplorePage() {
     ])
       .then(([allApps, myReviews]) => {
         const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const reviewedIds = new Set(myReviews.map((r) => r.app_id));
+        const activeReviewedIds = new Set(
+          myReviews
+            .filter((r) => !r.is_complete && !r.is_rejected)
+            .map((r) => r.app_id),
+        );
+        const allReviewedIds = new Set(myReviews.map((r) => r.app_id));
         setApps(
-          allApps.filter(
-            (a) => a.owner_id !== user.id && !reviewedIds.has(a.id),
-          ),
+          allApps.filter((a) => {
+            if (a.owner_id === user.id) return false;
+            if (activeReviewedIds.has(a.id)) return false;
+            if (!a.is_multi_review && allReviewedIds.has(a.id)) return false;
+            return true;
+          }),
         );
         setLoading(false);
       })

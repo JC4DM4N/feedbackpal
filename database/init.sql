@@ -28,8 +28,9 @@ CREATE TABLE IF NOT EXISTS apps (
     stage     VARCHAR(20)  NOT NULL CHECK (stage IN ('Pre-launch', 'Beta', 'Live')),
     description TEXT       NOT NULL,
     request     TEXT       NOT NULL,
-    credits   INTEGER      NOT NULL DEFAULT 1,
-    is_hidden BOOLEAN      NOT NULL DEFAULT FALSE,
+    credits         INTEGER      NOT NULL DEFAULT 1,
+    is_hidden       BOOLEAN      NOT NULL DEFAULT FALSE,
+    is_multi_review BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -31,10 +31,19 @@ def create_review(
     if not app:
         raise HTTPException(status_code=404, detail="App not found")
 
-    if db.query(models.Review).filter(
+    existing_q = db.query(models.Review).filter(
         models.Review.app_id == payload.app_id,
         models.Review.reviewer_id == current_user.id,
-    ).first():
+    )
+    if app.is_multi_review:
+        # Block only if there is an active (non-complete, non-rejected) review
+        existing = existing_q.filter(
+            models.Review.is_complete == False,
+            models.Review.is_rejected == False,
+        ).first()
+    else:
+        existing = existing_q.first()
+    if existing:
         raise HTTPException(status_code=400, detail="You have already reviewed this app")
 
     review = models.Review(

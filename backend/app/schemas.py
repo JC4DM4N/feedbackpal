@@ -38,6 +38,7 @@ class AppOut(BaseModel):
     request: str
     credits: int
     is_hidden: bool
+    is_multi_review: bool
     approved_count: int
     in_progress_count: int
 
