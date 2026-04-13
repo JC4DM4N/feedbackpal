@@ -64,6 +64,7 @@ function App() {
         <Route path="/signup" element={<PublicOnly><SignUpPage onSuccess={handleLoginSuccess} /></PublicOnly>} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/:username" element={<UserProfilePage />} />
 
         <Route element={<Protected />}>
           <Route element={<Dashboard user={user} onLogout={handleLogout} />}>
@@ -77,7 +78,6 @@ function App() {
             <Route path="/credits"       element={<CreditsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/how-it-works"  element={<DashboardHowItWorksPage />} />
-            <Route path="/:username"     element={<UserProfilePage />} />
             <Route path="*"              element={<Navigate to="/explore" replace />} />
           </Route>
         </Route>

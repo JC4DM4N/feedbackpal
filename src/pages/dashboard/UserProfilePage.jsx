@@ -15,19 +15,26 @@ export default function UserProfilePage() {
   const [reviewApp, setReviewApp] = useState(null);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isLoggedIn = !!localStorage.getItem("token");
   const isOwnProfile =
     currentUser.username?.toLowerCase() === username?.toLowerCase();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    Promise.all([
+    const fetches = [
       authFetch(`/users/by-username/${username}`).then((r) => r.json()),
       authFetch(`/apps/by-owner/${username}`).then((r) => r.json()),
-      authFetch("/reviews/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json()),
-    ])
-      .then(([profileData, appsData, myReviews]) => {
+    ];
+    if (token) {
+      fetches.push(
+        authFetch("/reviews/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((r) => r.json()),
+      );
+    }
+
+    Promise.all(fetches)
+      .then(([profileData, appsData, myReviews = []]) => {
         if (profileData.detail) {
           setError("User not found");
           setLoading(false);
@@ -62,14 +69,24 @@ export default function UserProfilePage() {
     return (
       <div className="profile-error-state">
         <p>{error}</p>
-        <button className="btn-submit-app" onClick={() => navigate("/explore")}>
-          Back to explore
-        </button>
+        {isLoggedIn && (
+          <button className="btn-submit-app" onClick={() => navigate("/explore")}>
+            Back to explore
+          </button>
+        )}
       </div>
     );
   }
 
   const hasCredits = profile?.available_credits > 0;
+
+  function handleReviewClick(app) {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    setReviewApp(app);
+  }
 
   return (
     <>
@@ -85,6 +102,13 @@ export default function UserProfilePage() {
         />
       )}
       <div className="explore">
+        {isLoggedIn && (
+          <div className="profile-topbar">
+            <button className="profile-back-btn" onClick={() => navigate(-1)}>
+              ← Back
+            </button>
+          </div>
+        )}
         <div className={`explore-hero profile-hero${isOwnProfile ? ' profile-hero--own' : ''}`}>
           <div className="profile-hero-identity">
             <div className="profile-avatar">
@@ -136,9 +160,10 @@ export default function UserProfilePage() {
                     key={app.id}
                     app={app}
                     isOwnApp={isOwnProfile}
+                    isLoggedIn={isLoggedIn}
                     hasCredits={hasCredits}
                     ownerUsername={username}
-                    onReview={() => setReviewApp(app)}
+                    onReview={() => handleReviewClick(app)}
                   />
                 ))}
             </div>
@@ -181,7 +206,7 @@ function ShareBox({ username }) {
   )
 }
 
-function AppCard({ app, isOwnApp, hasCredits, ownerUsername, onReview }) {
+function AppCard({ app, isOwnApp, isLoggedIn, hasCredits, ownerUsername, onReview }) {
   const stage = STAGE_STYLES[app.stage];
   return (
     <div className="app-card">
@@ -226,16 +251,11 @@ function AppCard({ app, isOwnApp, hasCredits, ownerUsername, onReview }) {
             <button
               className="app-review-btn"
               onClick={onReview}
-              disabled={!hasCredits}
-              title={
-                !hasCredits
-                  ? `${ownerUsername} has no credits available for you to leave feedback`
-                  : undefined
-              }
+              disabled={isLoggedIn && !hasCredits}
             >
-              Leave feedback →
+              {isLoggedIn ? "Leave feedback →" : "Log in to leave feedback →"}
             </button>
-            {!hasCredits && (
+            {isLoggedIn && !hasCredits && (
               <span className="profile-no-credits-msg">
                 {ownerUsername} has no credits available for you to leave
                 feedback
