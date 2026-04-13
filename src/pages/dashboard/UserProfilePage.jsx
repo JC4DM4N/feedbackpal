@@ -1,0 +1,326 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import "../dashboard/ExplorePage.css";
+import "./UserProfilePage.css";
+import { STAGE_STYLES } from "../../constants";
+import { authFetch } from "../../utils/authFetch";
+
+export default function UserProfilePage() {
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [apps, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [reviewApp, setReviewApp] = useState(null);
+
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwnProfile =
+    currentUser.username?.toLowerCase() === username?.toLowerCase();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    Promise.all([
+      authFetch(`/users/by-username/${username}`).then((r) => r.json()),
+      authFetch(`/apps/by-owner/${username}`).then((r) => r.json()),
+      authFetch("/reviews/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((r) => r.json()),
+    ])
+      .then(([profileData, appsData, myReviews]) => {
+        if (profileData.detail) {
+          setError("User not found");
+          setLoading(false);
+          return;
+        }
+        setProfile(profileData);
+
+        if (!isOwnProfile) {
+          const activeReviewedIds = new Set(
+            myReviews
+              .filter((r) => !r.is_complete && !r.is_rejected)
+              .map((r) => r.app_id),
+          );
+          const allReviewedIds = new Set(myReviews.map((r) => r.app_id));
+          appsData = appsData.filter((a) => {
+            if (activeReviewedIds.has(a.id)) return false;
+            if (!a.is_multi_review && allReviewedIds.has(a.id)) return false;
+            return true;
+          });
+        }
+
+        setApps(appsData);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load profile");
+        setLoading(false);
+      });
+  }, [username]);
+
+  if (error) {
+    return (
+      <div className="profile-error-state">
+        <p>{error}</p>
+        <button className="btn-submit-app" onClick={() => navigate("/explore")}>
+          Back to explore
+        </button>
+      </div>
+    );
+  }
+
+  const hasCredits = profile?.available_credits > 0;
+
+  return (
+    <>
+      {reviewApp && (
+        <ReviewModal
+          app={reviewApp}
+          onClose={() => setReviewApp(null)}
+          onReviewCreated={(reviewId, appId) => {
+            setApps((prev) => prev.filter((a) => a.id !== appId));
+            setReviewApp(null);
+            navigate(`/reviews/${reviewId}`);
+          }}
+        />
+      )}
+      <div className="explore">
+        <div className={`explore-hero profile-hero${isOwnProfile ? ' profile-hero--own' : ''}`}>
+          <div className="profile-hero-identity">
+            <div className="profile-avatar">
+              {username?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 className="explore-title profile-title">{username}'s apps</h1>
+              {isOwnProfile && (
+                <p className="explore-sub profile-sub">
+                  Share this page so others can discover and review your apps.
+                </p>
+              )}
+              {!isOwnProfile && !loading && !hasCredits && (
+                <p className="profile-no-credits-banner">
+                  {username} has no credits available — you cannot start new reviews
+                  for their apps right now.
+                </p>
+              )}
+            </div>
+          </div>
+          {isOwnProfile && <ShareBox username={username} />}
+        </div>
+
+        <div className="explore-body profile-body">
+          <div className="explore-results">
+            <div className="results-bar">
+              <span className="results-count">{apps.length} apps</span>
+              {isOwnProfile && (
+                <button
+                  className="btn-submit-app"
+                  onClick={() => navigate("/my-apps/new")}
+                >
+                  + Submit your app
+                </button>
+              )}
+            </div>
+            <div className="app-grid">
+              {loading && <p className="no-results">Loading…</p>}
+              {!loading && apps.length === 0 && (
+                <p className="no-results">
+                  {isOwnProfile
+                    ? "You haven't submitted any apps yet."
+                    : `${username} hasn't submitted any apps yet.`}
+                </p>
+              )}
+              {!loading &&
+                apps.map((app) => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    isOwnApp={isOwnProfile}
+                    hasCredits={hasCredits}
+                    ownerUsername={username}
+                    onReview={() => setReviewApp(app)}
+                  />
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ShareBox({ username }) {
+  const profileUrl = `https://nitpickr.dev/${username}`
+  const shareMessage = `Hey! I just submitted my apps on NitPickr. Leave some feedback and I'll review your app in return.\n\nCheck it out: ${profileUrl}`
+  const [copiedUrl, setCopiedUrl] = useState(false)
+  const [copiedMsg, setCopiedMsg] = useState(false)
+
+  function copy(text, setCopied) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <div className="share-box">
+      <p className="share-box-label">SHAREABLE LINK</p>
+      <div className="share-row">
+        <input className="share-input" readOnly value={profileUrl} />
+        <button className="share-copy-btn" onClick={() => copy(profileUrl, setCopiedUrl)}>
+          {copiedUrl ? "Copied!" : "Copy"}
+        </button>
+      </div>
+      <div className="share-row share-row--msg">
+        <textarea className="share-textarea" readOnly value={shareMessage} rows={4} />
+        <button className="share-copy-btn" onClick={() => copy(shareMessage, setCopiedMsg)}>
+          {copiedMsg ? "Copied!" : "Copy"}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AppCard({ app, isOwnApp, hasCredits, ownerUsername, onReview }) {
+  const stage = STAGE_STYLES[app.stage];
+  return (
+    <div className="app-card">
+      <div className="app-card-header">
+        <div className="app-icon" style={{ background: app.color }}>
+          {app.initials}
+        </div>
+        <div className="app-name-block">
+          <div className="app-name">{app.name}</div>
+          <div className="app-url">{app.url}</div>
+        </div>
+        <div className="app-card-meta">
+          <span className="app-category-tag">{app.category}</span>
+          <a
+            className="app-visit-btn"
+            href={app.url.startsWith("http") ? app.url : `https://${app.url}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Visit ↗
+          </a>
+        </div>
+      </div>
+      <p className="app-desc">{app.description}</p>
+      <div className="app-card-footer">
+        <div className="app-footer-stat">
+          <span className="app-footer-label">STAGE</span>
+          <span className="app-stage-badge" style={stage}>
+            {app.stage}
+          </span>
+        </div>
+        <div className="app-footer-stat">
+          <span className="app-footer-label">CREDITS</span>
+          <span className="app-footer-value">{app.credits}</span>
+        </div>
+        <div className="app-footer-stat">
+          <span className="app-footer-label">FEEDBACK</span>
+          <span className="app-footer-value">{app.approved_count}</span>
+        </div>
+        {!isOwnApp && (
+          <div className="profile-review-col">
+            <button
+              className="app-review-btn"
+              onClick={onReview}
+              disabled={!hasCredits}
+              title={
+                !hasCredits
+                  ? `${ownerUsername} has no credits available for you to leave feedback`
+                  : undefined
+              }
+            >
+              Leave feedback →
+            </button>
+            {!hasCredits && (
+              <span className="profile-no-credits-msg">
+                {ownerUsername} has no credits available for you to leave
+                feedback
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ReviewModal({ app, onClose, onReviewCreated }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleStart() {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await authFetch("/reviews/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ app_id: app.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.detail || "Failed to start review");
+        return;
+      }
+      onReviewCreated(data.id, app.id);
+    } catch {
+      setError("Could not connect to server");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="modal-header">
+          <div className="app-icon" style={{ background: app.color }}>
+            {app.initials}
+          </div>
+          <div>
+            <div className="modal-title">
+              Start a review for <strong>{app.name}</strong>
+            </div>
+            <div className="modal-url">{app.url}</div>
+          </div>
+        </div>
+        <div className="modal-scroll-body">
+          {app.description && (
+            <>
+              <p className="modal-section-label">ABOUT THIS APP</p>
+              <p className="modal-description">{app.description}</p>
+            </>
+          )}
+          <p className="modal-section-label">
+            WHAT THE DEVELOPER IS LOOKING FOR
+          </p>
+          <div className="modal-request">{app.request}</div>
+        </div>
+        {error && <p className="modal-error">{error}</p>}
+        <div className="modal-actions">
+          <button className="modal-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="modal-btn-start"
+            onClick={handleStart}
+            disabled={loading}
+          >
+            {loading ? "Starting…" : "Start review →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

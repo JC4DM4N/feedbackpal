@@ -67,6 +67,15 @@ def list_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
 
+@router.get("/by-username/{username}", response_model=schemas.UserProfile)
+def get_user_by_username(username: str, db: Session = Depends(get_db)):
+    from sqlalchemy import func
+    user = db.query(models.User).filter(func.lower(models.User.username) == username.lower()).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return schemas.UserProfile(id=user.id, username=user.username, available_credits=user.credits)
+
+
 @router.get("/{user_id}", response_model=schemas.UserOut)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()

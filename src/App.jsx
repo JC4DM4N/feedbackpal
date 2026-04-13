@@ -17,6 +17,7 @@ import ReviewAppPage from './pages/dashboard/ReviewAppPage'
 import CreditsPage from './pages/dashboard/CreditsPage'
 import SubmitAppPage from './pages/dashboard/SubmitAppPage'
 import NotificationsPage from './pages/dashboard/NotificationsPage'
+import UserProfilePage from './pages/dashboard/UserProfilePage'
 
 function getStoredUser() {
   try {
@@ -76,6 +77,7 @@ function App() {
             <Route path="/credits"       element={<CreditsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/how-it-works"  element={<DashboardHowItWorksPage />} />
+            <Route path="/:username"     element={<UserProfilePage />} />
             <Route path="*"              element={<Navigate to="/explore" replace />} />
           </Route>
         </Route>

@@ -304,6 +304,21 @@ def get_app_reviews(
     ]
 
 
+@router.get("/by-owner/{username}", response_model=List[schemas.AppOut])
+def list_apps_by_owner(username: str, db: Session = Depends(get_db)):
+    from sqlalchemy import func
+    user = db.query(models.User).filter(func.lower(models.User.username) == username.lower()).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    apps = (
+        db.query(models.App)
+        .filter(models.App.owner_id == user.id, models.App.is_hidden == False)
+        .order_by(models.App.id)
+        .all()
+    )
+    return _build_app_outs(apps, db)
+
+
 @router.delete("/{app_id}", status_code=204)
 def delete_app(
     app_id: int,

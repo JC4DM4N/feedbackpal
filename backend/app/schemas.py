@@ -133,6 +133,12 @@ class NotificationOut(BaseModel):
     created_at: datetime
 
 
+class UserProfile(BaseModel):
+    id: int
+    username: str
+    available_credits: int
+
+
 class AppReviewFeedItem(BaseModel):
     id: int
     reviewer_username: str
