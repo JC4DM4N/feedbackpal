@@ -82,7 +82,7 @@ class ReviewDetail(BaseModel):
     app_description: str
     app_request: str
     feedback: str | None
-    screenshots: list[str]
+    screenshots: list[dict]
 
 
 class ReviewPatch(BaseModel):

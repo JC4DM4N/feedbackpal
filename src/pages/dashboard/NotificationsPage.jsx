@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import './NotificationsPage.css'
+import './ExplorePage.css'
 import { authFetch } from '../../utils/authFetch'
 
 const TYPE_ICONS = {
@@ -36,6 +37,18 @@ export default function NotificationsPage() {
       .catch(() => { setError('Failed to load notifications'); setLoading(false) })
   }, [])
 
+  async function handleMarkAllRead() {
+    const unread = notifications.filter(n => !n.is_read)
+    if (!unread.length) return
+    const token = localStorage.getItem('token')
+    authFetch('/notifications/me/read', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    }).catch(() => {})
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+    onRead()
+  }
+
   async function handleClick(n) {
     if (DEAD_END_TYPES.has(n.type)) return
     if (!n.is_read) {
@@ -59,8 +72,15 @@ export default function NotificationsPage() {
   return (
     <div className="notif-page">
       <div className="notif-header">
-        <h1 className="notif-title">Notifications</h1>
-        <p className="notif-sub">Activity related to your apps and reviews.</p>
+        <div>
+          <h1 className="notif-title">Notifications</h1>
+          <p className="notif-sub">Activity related to your apps and reviews.</p>
+        </div>
+        {notifications.some(n => !n.is_read) && (
+          <button className="btn-submit-app" onClick={handleMarkAllRead}>
+            Mark all as read
+          </button>
+        )}
       </div>
 
       <div className="notif-body">
