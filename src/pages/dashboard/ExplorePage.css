@@ -288,9 +288,8 @@
     justify-content: flex-start;
   }
 
-  .app-review-btn {
-    width: 100%;
-    margin-left: 0;
+  .app-card-footer-actions {
+    gap: 8px;
   }
 
   .modal-overlay {
@@ -311,6 +310,26 @@
   color: #9ca3af;
   font-size: 14px;
   padding: 40px;
+}
+
+/* ── Profile link button (shared) ── */
+.feed-profile-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-decoration: none;
+  font-family: var(--mono);
+  white-space: nowrap;
+  border: 1.5px solid #d1cfc8;
+  border-radius: 6px;
+  padding: 1px 6px;
+  margin-left: 16px;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.feed-profile-link:hover {
+  color: #0f0e0b;
+  border-color: #9ca3af;
 }
 
 /* ── App card ── */
@@ -464,8 +483,35 @@
   opacity: 0.8;
 }
 
+.app-card-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-basis: 100%;
+}
+
+.app-profile-btn {
+  padding: 8px 16px;
+  background: transparent;
+  color: #6b7280;
+  border: 1.5px solid #d1cfc8;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--mono);
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-profile-btn:hover {
+  color: #0f0e0b;
+  border-color: #9ca3af;
+}
+
 .app-review-btn {
-  margin-left: auto;
   padding: 8px 16px;
   background: #0f0e0b;
   color: #fff;

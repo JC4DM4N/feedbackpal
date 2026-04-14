@@ -36,6 +36,18 @@ def _build_app_outs(apps: list, db: Session) -> list:
         .all()
     )
 
+    owner_ids = list({a.owner_id for a in apps})
+    owner_username = {
+        u.id: u.username
+        for u in db.query(models.User).filter(models.User.id.in_(owner_ids)).all()
+    }
+    reviews_given = dict(
+        db.query(models.Review.reviewer_id, func.count(models.Review.id))
+        .filter(models.Review.reviewer_id.in_(owner_ids), models.Review.is_complete == True)
+        .group_by(models.Review.reviewer_id)
+        .all()
+    )
+
     return [
         schemas.AppOut(
             id=a.id,
@@ -53,6 +65,8 @@ def _build_app_outs(apps: list, db: Session) -> list:
             is_multi_review=a.is_multi_review,
             approved_count=approved.get(a.id, 0),
             in_progress_count=in_progress.get(a.id, 0),
+            owner_username=owner_username.get(a.owner_id, ''),
+            owner_reviews_given=reviews_given.get(a.owner_id, 0),
         )
         for a in apps
     ]

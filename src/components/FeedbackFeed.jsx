@@ -1,5 +1,6 @@
 import { ReviewStatusBadge } from './ReviewStatusBadge'
 import '../pages/dashboard/MyAppDetailPage.css'
+import '../pages/dashboard/ExplorePage.css'
 import { formatTimeRemaining } from '../utils/time'
 
 export function FeedbackFeed({ reviews, onOpenReview }) {

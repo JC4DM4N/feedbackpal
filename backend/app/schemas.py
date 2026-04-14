@@ -41,6 +41,8 @@ class AppOut(BaseModel):
     is_multi_review: bool
     approved_count: int
     in_progress_count: int
+    owner_username: str
+    owner_reviews_given: int
 
     model_config = {"from_attributes": True}
 
