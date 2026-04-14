@@ -205,6 +205,7 @@ export default function ExplorePage() {
 }
 
 function AppCard({ app, onReview }) {
+  const navigate = useNavigate();
   const stage = STAGE_STYLES[app.stage];
   return (
     <div className="app-card">
@@ -245,13 +246,12 @@ function AppCard({ app, onReview }) {
           <span className="app-footer-value">{app.credits}</span>
         </div>
         <div className="app-card-footer-actions">
-          <a
+          <button
             className="app-profile-btn"
-            href={`/${app.owner_username}`}
-            onClick={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); navigate(`/${app.owner_username}`); }}
           >
             Profile →
-          </a>
+          </button>
           <button className="app-review-btn" onClick={onReview}>
             Leave feedback →
           </button>
