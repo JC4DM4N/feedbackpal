@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ReviewsPage.css";
+import "./ExplorePage.css";
 import { STAGE_STYLES } from "../../constants";
 import { authFetch } from "../../utils/authFetch";
 
@@ -28,9 +29,14 @@ export default function MyAppsPage() {
 
   return (
     <div className="reviews-page">
-      <div className="reviews-header">
-        <h1 className="reviews-title">My Apps</h1>
-        <p className="reviews-sub">Apps you have submitted for feedback.</p>
+      <div className="reviews-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div>
+          <h1 className="reviews-title">My Apps</h1>
+          <p className="reviews-sub">Apps you have submitted for feedback.</p>
+        </div>
+        <button className="btn-submit-app" onClick={() => navigate("/my-apps/new")}>
+          + Submit your app
+        </button>
       </div>
       <div className="reviews-body">
         {loading && <p className="reviews-empty">Loading…</p>}
