@@ -222,6 +222,35 @@ def upload_screenshot(
     return {"filename": filename, "url": r2.presign(filename)}
 
 
+# ── Delete screenshot ─────────────────────────────────────────────────────────
+
+@router.delete("/{review_id}/screenshots/{filename}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_screenshot(
+    review_id: int,
+    filename: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if review.reviewer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    if review.is_complete or review.is_submitted or review.is_rejected:
+        raise HTTPException(status_code=400, detail="Cannot modify a completed review")
+
+    screenshot = db.query(models.ReviewScreenshot).filter(
+        models.ReviewScreenshot.review_id == review_id,
+        models.ReviewScreenshot.filename == filename,
+    ).first()
+    if not screenshot:
+        raise HTTPException(status_code=404, detail="Screenshot not found")
+
+    r2.delete(filename)
+    db.delete(screenshot)
+    db.commit()
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _to_out(review: models.Review, app: models.App) -> schemas.ReviewOut:
@@ -264,5 +293,5 @@ def _to_detail(review: models.Review, app: models.App, screenshots: list) -> sch
         app_description=app.description,
         app_request=app.request,
         feedback=review.feedback,
-        screenshots=[r2.presign(f) for f in screenshots],
+        screenshots=[{"filename": f, "url": r2.presign(f)} for f in screenshots],
     )

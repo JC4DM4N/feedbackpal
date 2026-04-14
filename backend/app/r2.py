@@ -29,6 +29,12 @@ def upload(file_bytes: bytes, filename: str, content_type: str = 'image/png') ->
     return key
 
 
+def delete(filename: str) -> None:
+    """Delete an object from R2."""
+    key = f'{_folder}/{filename}'
+    _client.delete_object(Bucket=_bucket, Key=key)
+
+
 def presign(filename: str, expires_in: int = 3600) -> str:
     """Return a presigned URL for a screenshot filename, valid for expires_in seconds."""
     key = f'{_folder}/{filename}'

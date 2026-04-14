@@ -29,7 +29,7 @@ export default function ReviewAppPage() {
       .then(data => {
         setDetail(data)
         setFeedback(data.feedback || '')
-        setScreenshots(data.screenshots || [])
+        setScreenshots(data.screenshots || [])  // [{filename, url}]
         setLoading(false)
       })
       .catch(() => { setError('Failed to load review'); setLoading(false) })
@@ -93,7 +93,7 @@ export default function ReviewAppPage() {
         })
         if (res.ok) {
           const data = await res.json()
-          setScreenshots(prev => [...prev, data.url])
+          setScreenshots(prev => [...prev, { filename: data.filename, url: data.url }])
         }
       }
     } catch {
@@ -101,6 +101,23 @@ export default function ReviewAppPage() {
     } finally {
       setUploading(false)
       e.target.value = ''
+    }
+  }
+
+  async function handleDeleteScreenshot(filename) {
+    try {
+      const token = localStorage.getItem('token')
+      const res = await authFetch(`/reviews/${reviewId}/screenshots/${filename}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (res.ok) {
+        setScreenshots(prev => prev.filter(s => s.filename !== filename))
+      } else {
+        setError('Failed to delete screenshot')
+      }
+    } catch {
+      setError('Could not connect to server')
     }
   }
 
@@ -200,14 +217,24 @@ export default function ReviewAppPage() {
 
               {screenshots.length > 0 && (
                 <div className="screenshots-grid">
-                  {screenshots.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt={`Screenshot ${i + 1}`}
-                      className="screenshot-thumb screenshot-thumb--clickable"
-                      onClick={() => setExpandedImg(url)}
-                    />
+                  {screenshots.map((s, i) => (
+                    <div key={i} className="screenshot-thumb-wrap">
+                      <img
+                        src={s.url}
+                        alt={`Screenshot ${i + 1}`}
+                        className="screenshot-thumb screenshot-thumb--clickable"
+                        onClick={() => setExpandedImg(s.url)}
+                      />
+                      {!detail.is_complete && !detail.is_submitted && !detail.is_rejected && (
+                        <button
+                          className="screenshot-delete-btn"
+                          onClick={() => handleDeleteScreenshot(s.filename)}
+                          title="Delete screenshot"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
