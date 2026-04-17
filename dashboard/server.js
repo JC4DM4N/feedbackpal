@@ -111,6 +111,30 @@ app.get('/api/completed-reviews', async (req, res) => {
   }
 });
 
+app.get('/api/app-count', async (_req, res) => {
+  try {
+    const result = await pool.query('SELECT COUNT(*) AS total FROM apps');
+    res.json({ total: result.rows[0].total });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/credits-in-circulation', async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT SUM(credits) + SUM(escrow_credits) AS total
+      FROM users
+      WHERE username NOT IN ('JamesC', 'jc')
+    `);
+    res.json({ total: result.rows[0].total });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Dashboard running at http://localhost:${PORT}`);
 });
