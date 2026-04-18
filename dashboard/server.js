@@ -111,6 +111,31 @@ app.get('/api/completed-reviews', async (req, res) => {
   }
 });
 
+app.get('/api/apps', async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        a.id,
+        a.name AS app_name,
+        u.username AS owner,
+        u.credits AS owner_credits,
+        u.escrow_credits AS owner_escrow,
+        COUNT(DISTINCT r_recv.id) AS reviews_received,
+        COUNT(DISTINCT r_given.id) AS reviews_given
+      FROM apps a
+      JOIN users u ON a.owner_id = u.id
+      LEFT JOIN reviews r_recv ON r_recv.app_id = a.id
+      LEFT JOIN reviews r_given ON r_given.reviewer_id = a.owner_id
+      GROUP BY a.id, a.name, u.username, u.credits, u.escrow_credits
+      ORDER BY a.id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/app-count', async (_req, res) => {
   try {
     const result = await pool.query('SELECT COUNT(*) AS total FROM apps');

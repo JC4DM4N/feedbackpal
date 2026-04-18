@@ -33,7 +33,7 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-      gap: 20px;
+      gap: 28px;
     }
 
     .card {
@@ -138,7 +138,7 @@
     .stat-row {
       display: flex;
       gap: 20px;
-      margin-bottom: 16px;
+      margin-bottom: 28px;
     }
 
     .stat {
@@ -226,6 +226,26 @@
         </table>
       </div>
     </div>
+
+    <div class="card" style="grid-column: 1 / -1">
+      <div class="card-title">Apps</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>App</th>
+              <th>Owner</th>
+              <th>Credits</th>
+              <th>Escrow</th>
+              <th>Reviews Received</th>
+              <th>Reviews Given</th>
+            </tr>
+          </thead>
+          <tbody id="table-apps"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -293,13 +313,14 @@
     }
 
     async function load() {
-      const [users, reviews, active, completed, credits, appCount] = await Promise.all([
+      const [users, reviews, active, completed, credits, appCount, apps] = await Promise.all([
         fetch('/api/users-per-day').then(r => r.json()),
         fetch('/api/reviews-completed-per-day').then(r => r.json()),
         fetch('/api/active-reviews').then(r => r.json()),
         fetch('/api/completed-reviews').then(r => r.json()),
         fetch('/api/credits-in-circulation').then(r => r.json()),
         fetch('/api/app-count').then(r => r.json()),
+        fetch('/api/apps').then(r => r.json()),
       ]);
 
       // Stats
@@ -309,6 +330,22 @@
       document.getElementById('stat-completed').textContent = Array.isArray(completed) ? completed.length : '—';
       document.getElementById('stat-credits').textContent = credits.total ?? '—';
       document.getElementById('stat-apps').textContent = appCount.total ?? '—';
+
+      // Apps table
+      const tbApps = document.getElementById('table-apps');
+      if (!Array.isArray(apps) || apps.error) {
+        tbApps.innerHTML = `<tr><td colspan="6" class="error">${apps.error || 'Error loading'}</td></tr>`;
+      } else {
+        tbApps.innerHTML = apps.map(a => `<tr>
+          <td>${a.id}</td>
+          <td>${a.app_name}</td>
+          <td>${a.owner}</td>
+          <td>${a.owner_credits}</td>
+          <td>${a.owner_escrow}</td>
+          <td>${a.reviews_received}</td>
+          <td>${a.reviews_given}</td>
+        </tr>`).join('');
+      }
 
       // Charts
       if (Array.isArray(users) && users.length) {
