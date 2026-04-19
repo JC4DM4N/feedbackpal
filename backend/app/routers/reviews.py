@@ -149,7 +149,7 @@ def update_review(
         review.is_submitted = payload.is_submitted
         if payload.is_submitted:
             review.reviewer_deadline = None
-            review.owner_deadline = datetime.now(timezone.utc) + timedelta(days=7)
+            review.owner_deadline = datetime.now(timezone.utc) + timedelta(hours=48)
             owner = db.query(models.User).filter(models.User.id == app.owner_id).first()
             if review.review_requested:
                 msg = f"{current_user.username} resubmitted their review for {app.name}"
