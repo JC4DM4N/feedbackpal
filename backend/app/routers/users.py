@@ -73,7 +73,42 @@ def get_user_by_username(username: str, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(func.lower(models.User.username) == username.lower()).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return schemas.UserProfile(id=user.id, username=user.username, available_credits=user.credits)
+    return schemas.UserProfile(
+        id=user.id,
+        username=user.username,
+        available_credits=user.credits,
+        twitter_username=user.twitter_username,
+    )
+
+
+@router.patch("/me", response_model=schemas.UserProfile)
+def patch_me(
+    payload: schemas.UserPatch,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    import re
+    if payload.username is not None:
+        if not re.match(r'^[A-Za-z0-9_]+$', payload.username):
+            raise HTTPException(status_code=400, detail="Username must be letters, numbers, and underscores only")
+        taken = db.query(models.User).filter(
+            models.User.username == payload.username,
+            models.User.id != current_user.id,
+        ).first()
+        if taken:
+            raise HTTPException(status_code=409, detail="Username already taken")
+        current_user.username = payload.username
+    if payload.twitter_username is not None:
+        stripped = payload.twitter_username.lstrip('@').strip()
+        current_user.twitter_username = stripped if stripped else None
+    db.commit()
+    db.refresh(current_user)
+    return schemas.UserProfile(
+        id=current_user.id,
+        username=current_user.username,
+        available_credits=current_user.credits,
+        twitter_username=current_user.twitter_username,
+    )
 
 
 @router.get("/{user_id}", response_model=schemas.UserOut)

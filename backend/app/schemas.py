@@ -146,6 +146,12 @@ class UserProfile(BaseModel):
     id: int
     username: str
     available_credits: int
+    twitter_username: str | None
+
+
+class UserPatch(BaseModel):
+    username: str | None = None
+    twitter_username: str | None = None
 
 
 class AppReviewFeedItem(BaseModel):

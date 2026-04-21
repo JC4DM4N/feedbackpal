@@ -19,6 +19,12 @@ export default function UserProfilePage() {
   const isOwnProfile =
     currentUser.username?.toLowerCase() === username?.toLowerCase();
 
+  const [editing, setEditing] = useState(false);
+  const [editUsername, setEditUsername] = useState("");
+  const [editTwitter, setEditTwitter] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const fetches = [
@@ -80,6 +86,41 @@ export default function UserProfilePage() {
 
   const hasCredits = profile?.available_credits > 0;
 
+  function startEditing() {
+    setEditUsername(profile.username);
+    setEditTwitter(profile.twitter_username || "");
+    setEditError(null);
+    setEditing(true);
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    setEditError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await authFetch("/users/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ username: editUsername, twitter_username: editTwitter }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setEditError(data.detail || "Failed to save");
+        return;
+      }
+      setProfile(data);
+      // update localStorage so isOwnProfile stays correct after username change
+      const stored = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem("user", JSON.stringify({ ...stored, username: data.username }));
+      setEditing(false);
+      if (data.username !== username) navigate(`/${data.username}`);
+    } catch {
+      setEditError("Could not connect to server");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function handleReviewClick(app) {
     if (!isLoggedIn) {
       navigate("/login");
@@ -108,7 +149,7 @@ export default function UserProfilePage() {
               {username?.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="explore-title profile-title">{username}'s apps</h1>
+              <h1 className="explore-title profile-title">{profile?.username || username}'s apps</h1>
               {isOwnProfile && (
                 <p className="explore-sub profile-sub">
                   Share this page so others can discover and review your apps.
@@ -120,9 +161,57 @@ export default function UserProfilePage() {
                   for their apps right now.
                 </p>
               )}
+              <div className="profile-meta-row">
+                {isOwnProfile && !editing && (
+                  <button className="profile-edit-btn" onClick={startEditing}>Edit profile</button>
+                )}
+                {profile?.twitter_username && (
+                  <a
+                    className="profile-twitter-link"
+                    href={`https://twitter.com/${profile.twitter_username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img src="/x_logo.png" width="20" height="20" alt="X" style={{ display: 'block', borderRadius: '5px' }} />
+                    @{profile.twitter_username}
+                  </a>
+                )}
+              </div>
             </div>
           </div>
-          {isOwnProfile && <ShareBox username={username} />}
+
+          {isOwnProfile && editing && (
+            <form className="profile-edit-form" onSubmit={e => { e.preventDefault(); handleSave(); }}>
+              <div className="profile-edit-field">
+                <label className="profile-edit-label">Username</label>
+                <input
+                  className="profile-edit-input"
+                  value={editUsername}
+                  onChange={e => setEditUsername(e.target.value)}
+                  placeholder="username"
+                />
+              </div>
+              <div className="profile-edit-field">
+                <label className="profile-edit-label">X / Twitter</label>
+                <div className="profile-edit-prefix-wrap">
+                  <span className="profile-edit-prefix">twitter.com/</span>
+                  <input
+                    className="profile-edit-input profile-edit-input--prefix"
+                    value={editTwitter}
+                    onChange={e => setEditTwitter(e.target.value.replace(/^@/, ''))}
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+              {editError && <p className="profile-edit-error">{editError}</p>}
+              <div className="profile-edit-actions">
+                <button type="button" className="profile-edit-cancel" onClick={() => setEditing(false)}>Cancel</button>
+                <button type="submit" className="profile-edit-save" disabled={saving}>{saving ? "Saving…" : "Save"}</button>
+              </div>
+            </form>
+          )}
+
+          {isOwnProfile && !editing && <ShareBox username={profile?.username || username} />}
         </div>
 
         <div className="explore-body profile-body">
