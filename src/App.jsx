@@ -39,6 +39,7 @@ function App() {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
+    window.location.replace('/login')
   }
 
   useEffect(() => {
