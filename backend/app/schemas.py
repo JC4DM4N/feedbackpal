@@ -181,3 +181,22 @@ class AppReviewFeedItem(BaseModel):
     created_date: datetime
     reviewer_deadline: datetime | None
     owner_deadline: datetime | None
+
+
+class ReviewReceived(BaseModel):
+    id: int
+    app_id: int
+    app_name: str
+    app_initials: str
+    app_color: str
+    app_stage: str
+    app_url: str
+    reviewer_username: str
+    is_submitted: bool
+    is_complete: bool
+    is_rejected: bool
+    is_expired: bool
+    review_requested: bool
+    created_date: datetime
+    reviewer_deadline: datetime | None
+    owner_deadline: datetime | None

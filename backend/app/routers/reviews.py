@@ -72,6 +72,47 @@ def create_review(
 
 # ── List my reviews ───────────────────────────────────────────────────────────
 
+@router.get("/received", response_model=List[schemas.ReviewReceived])
+def get_received_reviews(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    my_app_ids = [
+        a.id for a in db.query(models.App.id).filter(models.App.owner_id == current_user.id).all()
+    ]
+    if not my_app_ids:
+        return []
+    rows = (
+        db.query(models.Review, models.App, models.User)
+        .join(models.App, models.Review.app_id == models.App.id)
+        .join(models.User, models.Review.reviewer_id == models.User.id)
+        .filter(models.Review.app_id.in_(my_app_ids))
+        .order_by(models.Review.created_date.desc())
+        .all()
+    )
+    return [
+        schemas.ReviewReceived(
+            id=review.id,
+            app_id=app.id,
+            app_name=app.name,
+            app_initials=app.initials,
+            app_color=app.color,
+            app_stage=app.stage,
+            app_url=app.url,
+            reviewer_username=user.username,
+            is_submitted=review.is_submitted,
+            is_complete=review.is_complete,
+            is_rejected=review.is_rejected,
+            is_expired=review.is_expired,
+            review_requested=review.review_requested,
+            created_date=review.created_date,
+            reviewer_deadline=review.reviewer_deadline,
+            owner_deadline=review.owner_deadline,
+        )
+        for review, app, user in rows
+    ]
+
+
 @router.get("/me", response_model=List[schemas.ReviewOut])
 def get_my_reviews(
     db: Session = Depends(get_db),
