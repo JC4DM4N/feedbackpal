@@ -418,6 +418,7 @@
     padding: 24px 20px;
     border-radius: 16px 16px 12px 12px;
     max-height: 85vh;
+    overflow: scroll;
   }
 
   .user-card {
@@ -676,6 +677,7 @@
   flex-direction: column;
   gap: 20px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: scroll;
 }
 
 .modal-close {
@@ -709,6 +711,12 @@
 
 .modal-title {
   font-size: 16px;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.modal-subtitle {
+  font-size: 12px;
   color: #374151;
   line-height: 1.4;
 }

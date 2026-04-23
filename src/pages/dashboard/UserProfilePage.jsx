@@ -488,8 +488,22 @@ function ExchangeModal({ mode, username, myApps, onClose, onLogin, onSignup, onE
         <div className="modal-header">
           <div className="modal-title">Request a feedback exchange with <strong>{username}</strong></div>
         </div>
-        <p className="modal-section-label" style={{ padding: '0 24px' }}>WHICH OF YOUR APPS SHOULD {username.toUpperCase()} REVIEW?</p>
-        <div className="exchange-app-options" style={{ padding: '8px 24px 4px' }}>
+        <div className="modal-header">
+          <div className="modal-subtitle">
+            <p>
+            You are about to offer to give feedback on one of <strong>{username}</strong>'s apps in exchange for 
+            feedback on one of your own. If they accept, you will both have 48 hours to submit your feedback.
+            </p>
+            <br/>
+            <p>
+            Select which of your apps you would like <strong>{username}</strong> to review, and leave them a nice 
+            message to introduce yourself.
+            </p>
+          </div>
+        </div>
+        <p className="modal-section-label">WHICH OF YOUR APPS SHOULD {username.toUpperCase()} REVIEW?</p>
+        {/* <div className="exchange-app-options" style={{ padding: '8px 24px 4px' }}> */}
+        <div className="exchange-app-options">
           {myApps.map(app => (
             <button
               key={app.id}
@@ -501,8 +515,9 @@ function ExchangeModal({ mode, username, myApps, onClose, onLogin, onSignup, onE
             </button>
           ))}
         </div>
-        <div style={{ padding: '8px 24px 0' }}>
-          <p className="modal-section-label">MESSAGE (OPTIONAL)</p>
+        {/* <div style={{ padding: '8px 24px 0' }}> */}
+        <div>
+          <p className="modal-section-label">MESSAGE</p>
           <textarea
             className="review-feedback-input"
             placeholder={`Say hi to ${username}…`}
