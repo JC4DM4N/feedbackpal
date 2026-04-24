@@ -301,13 +301,16 @@
   }
 
   .review-app-actions {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .review-submit-btn,
   .review-delete-btn {
     flex: 1;
     justify-content: center;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
   }
 }
 
@@ -479,7 +482,6 @@
   cursor: pointer;
   font-family: var(--mono);
   transition: opacity 0.12s;
-  white-space: nowrap;
 }
 
 .review-submit-btn:hover:not(:disabled) {
