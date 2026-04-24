@@ -232,7 +232,7 @@ export default function ReviewAppPage() {
           <button
             className="review-submit-btn"
             onClick={handleSubmit}
-            disabled={saving || detail.is_complete || detail.is_submitted || detail.is_rejected || !feedback.trim() || !testedPlatform || !testDuration.trim() || createdAccount === ''}
+            disabled={saving || detail.is_complete || detail.is_submitted || detail.is_rejected || feedback.trim().length < 200 || !testedPlatform || !testDuration.trim() || createdAccount === ''}
           >
             {saving ? 'Submitting…'
               : detail.is_complete ? 'Approved'
@@ -327,6 +327,11 @@ export default function ReviewAppPage() {
               onChange={e => setFeedback(e.target.value)}
               disabled={detail.is_complete || detail.is_submitted || detail.is_rejected}
             />
+            {!detail.is_submitted && !detail.is_complete && !detail.is_rejected && (
+              <p className={`feedback-char-count ${feedback.trim().length >= 200 ? 'feedback-char-count--ok' : ''}`}>
+                {feedback.trim().length} / 200 characters minimum
+              </p>
+            )}
           </section>
 
           {/* Conversation thread */}
