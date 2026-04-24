@@ -337,7 +337,7 @@ export default function ReviewAppPage() {
 
           <section className="review-section">
             <p className={`rubric-label${showValidation && feedback.trim().length < 200 ? ' rubric-label--error' : ''}`}>
-              Your Feedback{showValidation && feedback.trim().length < 200 && <span className="rubric-error-hint"> — minimum 200 characters. Be sure to include plenty of detail!</span>}
+              Your Feedback{showValidation && feedback.trim().length < 200 && <span className="rubric-error-hint"> — minimum 200 characters. Ensure you include plenty of detail!</span>}
             </p>
             <textarea
               className={`review-feedback-input${showValidation && feedback.trim().length < 200 ? ' review-feedback-input--error' : ''}`}
