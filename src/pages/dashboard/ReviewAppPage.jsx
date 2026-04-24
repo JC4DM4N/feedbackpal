@@ -222,7 +222,7 @@ export default function ReviewAppPage() {
         </div>
       </div>
 
-      {!detail.is_expired && (
+      {!detail.is_expired && !detail.is_complete && !detail.is_rejected && (
         <div className="review-app-actions review-app-actions--top">
           {!detail.is_complete && (
             <button className="review-delete-btn" onClick={handleDelete}>
